@@ -142,21 +142,16 @@ void QSPSetInputStrText(const QSP_CHAR *val)
 /* ------------------------------------------------------------ */
 /* Actions */
 
-/* Number of actions */
-int QSPGetActionsCount()
+/* Get current actions */
+int QSPGetActions(QSPListItem *items, int itemsBufSize)
 {
-	return qspCurActionsCount;
-}
-/* Operations on the specified index */
-void QSPGetActionData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
-{
-	if (ind >= 0 && ind < qspCurActionsCount)
+	int i;
+	for (i = 0; i < qspCurActionsCount && i < itemsBufSize; ++i)
 	{
-		*image = qspCurActions[ind].Image;
-		*desc = qspCurActions[ind].Desc;
+		items[i].Name = qspCurActions[i].Desc;
+		items[i].Image = qspCurActions[i].Image;
 	}
-	else
-		*image = *desc = 0;
+	return qspCurActionsCount;
 }
 /* Executing the code for the selected action */
 QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh)

@@ -122,8 +122,7 @@
 	/* Input string */
 	QSP_LEGACY_EXTERN void QSPSetInputStrText(const QSP_CHAR *str);
 	/* Actions */
-	QSP_LEGACY_EXTERN int QSPGetActionsCount();
-	QSP_LEGACY_EXTERN void QSPGetActionData(int ind, QSP_CHAR **imgPath, QSP_CHAR **desc);
+	QSP_LEGACY_EXTERN int QSPGetActions(QSPListItem *items, int itemsBufSize);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh);
 	QSP_LEGACY_EXTERN int QSPGetSelActionIndex();
