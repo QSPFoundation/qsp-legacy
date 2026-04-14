@@ -152,6 +152,8 @@
 	QSP_LEGACY_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
 	/* Variables */
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, int *count);
+	QSP_LEGACY_EXTERN QSP_BOOL QSPGetNumVarValue(const QSP_CHAR *name, int ind, int *res);
+	QSP_LEGACY_EXTERN QSP_BOOL QSPGetStrVarValue(const QSP_CHAR *name, int ind, QSP_CHAR **res);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, int ind, int *numVal, QSP_CHAR **strVal);
 	QSP_LEGACY_EXTERN int QSPGetMaxVarsCount();
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetVarNameByIndex(int ind, QSP_CHAR **name);

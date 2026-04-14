@@ -262,6 +262,28 @@ QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, int *count)
 	*count = var->ValsCount;
 	return QSP_TRUE;
 }
+/* Get numeric value of the specified array item */
+QSP_BOOL QSPGetNumVarValue(const QSP_CHAR *name, int ind, int *res)
+{
+	QSPVar *var;
+	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
+	qspResetError();
+	var = qspVarReference((QSP_CHAR *)name, QSP_FALSE);
+	if (qspErrorNum || ind < 0 || ind >= var->ValsCount) return QSP_FALSE;
+	*res = var->Values[ind].Num;
+	return QSP_TRUE;
+}
+/* Get string value of the specified array item */
+QSP_BOOL QSPGetStrVarValue(const QSP_CHAR *name, int ind, QSP_CHAR **res)
+{
+	QSPVar *var;
+	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
+	qspResetError();
+	var = qspVarReference((QSP_CHAR *)name, QSP_FALSE);
+	if (qspErrorNum || ind < 0 || ind >= var->ValsCount) return QSP_FALSE;
+	*res = var->Values[ind].Str;
+	return QSP_TRUE;
+}
 /* Get the values of the specified array element */
 QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, int ind, int *numVal, QSP_CHAR **strVal)
 {
