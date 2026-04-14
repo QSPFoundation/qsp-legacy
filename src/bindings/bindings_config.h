@@ -18,19 +18,19 @@
 #ifndef QSP_BINDINGSCONFIG
 	#define QSP_BINDINGSCONFIG
 
+	#ifndef QSP_BINDING
+		#define QSP_BINDING
+		#define _DEFAULT_BINDING
+		#include "default/qsp_default.h"
+	#endif
+
+	/* Place your bindings here */
+
 	/* JVM binding */
 	#ifdef _JVM
 		#define QSP_BINDING
 		#define _JVM_BINDING
 		#include "jvm/qsp_jvm.h"
-	#endif
-
-	/* Place your bindings here */
-
-	#ifndef QSP_BINDING
-		#define QSP_BINDING
-		#define _DEFAULT_BINDING
-		#include "default/qsp_default.h"
 	#endif
 
 #endif

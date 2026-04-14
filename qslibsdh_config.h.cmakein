@@ -1,8 +1,0 @@
-#ifndef QSLIBSDH_CONFIG_H
-#define QSLIBSDH_CONFIG_H
-
-#define QSLIBSDH_VER_STR "@qslibsdh_VERSION@"
-#define QSLIBSDH_GAMEMINVER_STR "@QSLIBSDH_GAMEMIN_VER@"
-
-#endif
-

@@ -1,0 +1,8 @@
+#ifndef QSP_LEGACY_CONFIG_H
+#define QSP_LEGACY_CONFIG_H
+
+#define QSP_LEGACY_VER_STR "@qsp-legacy_VERSION@"
+#define QSP_LEGACY_GAMEMINVER_STR "@QSP_LEGACY_GAMEMIN_VER@"
+
+#endif
+

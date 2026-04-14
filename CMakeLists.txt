@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-project(qslibsdh VERSION 5.7.0)
+project(qsp-legacy VERSION 5.7.0)
 
-set(QSLIBSDH_GAMEMIN_VER "5.7.0")
+set(QSP_LEGACY_GAMEMIN_VER "5.7.0")
 
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
@@ -17,8 +17,8 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-set(TARGET qslibsdh PROPERTY CMAKE_C_STANDARD 17)
-set(TARGET qslibsdh PROPERTY CMAKE_C_STANDARD_REQUIRED ON)
+set(TARGET qsp-legacy PROPERTY CMAKE_C_STANDARD 17)
+set(TARGET qsp-legacy PROPERTY CMAKE_C_STANDARD_REQUIRED ON)
 
 set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
@@ -79,9 +79,9 @@ else()
 	add_library(oniguruma::onig ALIAS onig)
 endif()
 
-configure_file(qslibsdh_config.h.cmakein qslibsdh_config.h @ONLY)
+configure_file(qsp_legacy_config.h.cmakein qsp_legacy_config.h @ONLY)
 
-set(QSLIBSDH_SOURCES
+set(QSP_LEGACY_SOURCES
 		src/bindings/bindings_config.h
 		src/bindings/default/default_callbacks.c
 		src/bindings/default/default_control.c
@@ -114,23 +114,23 @@ set(QSLIBSDH_SOURCES
 		src/variables.c src/variables.h
 		src/variant.c src/variant.h
 )
-add_library(qslibsdh SHARED ${QSLIBSDH_SOURCES})
-target_compile_definitions(qslibsdh PUBLIC _UNICODE)
+add_library(qsp-legacy SHARED ${QSP_LEGACY_SOURCES})
+target_compile_definitions(qsp-legacy PUBLIC _UNICODE)
 if (WIN32)
-	target_compile_definitions(qslibsdh PRIVATE _CRT_SECURE_NO_WARNINGS)
+	target_compile_definitions(qsp-legacy PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
-target_link_libraries(qslibsdh PRIVATE oniguruma::onig)
+target_link_libraries(qsp-legacy PRIVATE oniguruma::onig)
 
 if (BUILD_JVM)
-	target_compile_definitions(qslibsdh PRIVATE _JVM)
+	target_compile_definitions(qsp-legacy PRIVATE _JVM)
 	if (NOT ANDROID)
 		find_package(JNI)
-		target_include_directories(qslibsdh PRIVATE ${JNI_INCLUDE_DIRS})
-		target_link_libraries(qslibsdh PRIVATE ${JNI_LIBRARIES})
+		target_include_directories(qsp-legacy PRIVATE ${JNI_INCLUDE_DIRS})
+		target_link_libraries(qsp-legacy PRIVATE ${JNI_LIBRARIES})
 	endif()
 endif()
 
-target_include_directories(qslibsdh
+target_include_directories(qsp-legacy
 		INTERFACE
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/default>"
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/bindings>"
@@ -139,30 +139,30 @@ target_include_directories(qslibsdh
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/src/default>"
 )
 
-generate_export_header(qslibsdh
-		BASE_NAME QSLibSDH
-		EXPORT_MACRO_NAME QSLIBSDH_EXTERN
+generate_export_header(qsp-legacy
+		BASE_NAME QspLegacy
+		EXPORT_MACRO_NAME QSP_LEGACY_EXTERN
 )
 
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/cmake/QSLibSDH/QSLibSDHConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
-configure_package_config_file(QSLibSDHConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/QSLibSDH/QSLibSDHConfig.cmake
-		INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QSLibSDH"
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/cmake/QspLegacy/QspLegacyConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(QspLegacyConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/QspLegacy/QspLegacyConfig.cmake
+		INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QspLegacy"
 )
 
-set(QSLIBSDH_INSTALL_TARGETS qslibsdh)
+set(QSP_LEGACY_INSTALL_TARGETS qsp-legacy)
 
 if (TARGET onig)
 	get_target_property(ONIG_IS_IMPORTED onig IMPORTED)
 	if (NOT ONIG_IS_IMPORTED)
-		list(APPEND QSLIBSDH_INSTALL_TARGETS onig)
+		list(APPEND QSP_LEGACY_INSTALL_TARGETS onig)
 	endif()
 endif()
 
-export(TARGETS ${QSLIBSDH_INSTALL_TARGETS} NAMESPACE QSLibSDH:: FILE ${CMAKE_CURRENT_BINARY_DIR}/QSLibSDHTargets.cmake)
+export(TARGETS ${QSP_LEGACY_INSTALL_TARGETS} NAMESPACE QspLegacy:: FILE ${CMAKE_CURRENT_BINARY_DIR}/QspLegacyTargets.cmake)
 
-install(TARGETS ${QSLIBSDH_INSTALL_TARGETS} EXPORT QSLibSDHTargets)
+install(TARGETS ${QSP_LEGACY_INSTALL_TARGETS} EXPORT QspLegacyTargets)
 
-install(EXPORT QSLibSDHTargets FILE QSLibSDHTargets.cmake NAMESPACE QSLibSDH:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QSLibSDH")
+install(EXPORT QspLegacyTargets FILE QspLegacyTargets.cmake NAMESPACE QspLegacy:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/QspLegacy")
 
 install(
 		DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake
@@ -172,7 +172,7 @@ install(
 install(FILES
 		src/bindings/qsp.h
 		src/bindings/bindings_config.h
-		"${CMAKE_CURRENT_BINARY_DIR}/qslibsdh_export.h"
+		"${CMAKE_CURRENT_BINARY_DIR}/qsp_legacy_export.h"
 		DESTINATION
 		"${CMAKE_INSTALL_INCLUDEDIR}/src"
 )

@@ -39,7 +39,7 @@
 
 /* -------- */
 
-#include "qslibsdh_config.h"
+#include "qsp_legacy_config.h"
 #include "bindings/bindings_config.h"
 #include "bindings/qsp.h"
 #include <oniguruma.h>
@@ -59,7 +59,7 @@
 		#define QSP_PATHDELIMS QSP_FMT("/")
 	#endif
 
-	#define QSP_VER QSP_FMT(QSLIBSDH_VER_STR)
+	#define QSP_VER QSP_FMT(QSP_LEGACY_VER_STR)
 	#define QSP_LOCALE "C"
 	#define QSP_STRCHAR QSP_FMT("$")
 	#define QSP_LABEL QSP_FMT(":")
