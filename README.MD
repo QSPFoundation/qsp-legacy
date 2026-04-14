@@ -1,7 +1,32 @@
-# QSLibSDH
+# QSP Legacy
 
-QSLibSDH (long name QSLibSeedhartha) is a new iteration of the [QSP engine version 5.7.0](https://github.com/seedhartha/QuestPlayer/tree/34c74d3a073ee5ce7b053cb68c94699e2949dbe2/app/src/main/jni) specifically for [QSPlugin](https://github.com/l3ger0j/QSPlugin)
+This repository contains source code of the QSP Legacy game engine.
 
-## Changes
+## Useful links
 
-The main changes relate to JVM bindings and are necessary to enable the library to be used in Android OS applications. The build system has also been modified, with the addition of auto-generation of certain files and the replacement of the keyword 'static' with 'INLINE' in some instances.
+### Documentation
+
+* Docs: https://github.com/QSPFoundation/qspfoundation.github.io
+
+### Players
+
+* Classic QSP Legacy player: https://github.com/QSPFoundation/qspgui-legacy
+* Quasporium: https://play.google.com/store/apps/details?id=com.pixnpunk.quasporium
+
+## Linux & MacOS build
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+## Windows build
+
+```bash
+cmake -S . -B build -G "Visual Studio 17 2022" -A Win32 -DCMAKE_INSTALL_PREFIX=out
+cmake --build build --target install --config Release
+```
+
+## Chat group
+
+Discord: https://discord.gg/6gWVYUtUGZ | Telegram: https://t.me/QuestopiaChat
