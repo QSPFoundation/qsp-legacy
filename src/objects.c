@@ -118,6 +118,18 @@ int qspObjIndex(QSP_CHAR *name)
 	return -1;
 }
 
+QSP_BOOL qspGetObjectInfoByIndex(int index, QSPListItem *info)
+{
+	if (index >= 0 && index < qspCurObjectsCount)
+	{
+		QSPObj *obj = qspCurObjects + index;
+		info->Name = obj->Desc;
+		info->Image = obj->Image;
+		return QSP_TRUE;
+	}
+	return QSP_FALSE;
+}
+
 QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSPObj *obj;

@@ -91,4 +91,10 @@
 
 	typedef int QSP_BOOL;
 
+	typedef struct
+	{
+		QSP_CHAR *Name;
+		QSP_CHAR *Image;
+	} QSPListItem;
+
 #endif

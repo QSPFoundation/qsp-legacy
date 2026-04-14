@@ -54,13 +54,13 @@ void QSPGetCurStateData(QSP_CHAR **loc, int *actIndex, int *line)
 /* ------------------------------------------------------------ */
 /*  */
 
-/* Get version of the qslibsdh */
+/* Get version of the qsp-legacy */
 const QSP_CHAR *QSPGetVersion()
 {
 	return QSP_VER;
 }
 
-/* Get build datetime of the qslibsdh */
+/* Get build datetime of the qsp-legacy */
 const QSP_CHAR *QSPGetCompiledDateTime()
 {
 	return QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__);
@@ -200,21 +200,13 @@ QSP_BOOL QSPIsActionsChanged()
 /* ------------------------------------------------------------ */
 /* Objects */
 
-/* Number of objects */
-int QSPGetObjectsCount()
+/* Get current objects */
+int QSPGetObjects(QSPListItem *items, int itemsBufSize)
 {
+	int i;
+	for (i = 0; i < qspCurObjectsCount && i < itemsBufSize; ++i)
+		qspGetObjectInfoByIndex(i, items + i);
 	return qspCurObjectsCount;
-}
-/* Data for the object with the specified index */
-void QSPGetObjectData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
-{
-	if (ind >= 0 && ind < qspCurObjectsCount)
-	{
-		*image = qspCurObjects[ind].Image;
-		*desc = qspCurObjects[ind].Desc;
-	}
-	else
-		*image = *desc = 0;
 }
 /* Set the index of the selected object */
 QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)
