@@ -78,7 +78,6 @@ int qspCRCTable[256] =
 INLINE int qspCRC(void *, int);
 INLINE void qspIncludeFile(QSP_CHAR *);
 INLINE void qspOpenIncludes();
-INLINE FILE *qspFileOpen(QSP_CHAR *, QSP_CHAR *);
 INLINE QSP_BOOL qspCheckQuest(char **, int, QSP_BOOL);
 INLINE QSP_BOOL qspCheckGameStatus(QSP_CHAR **, int);
 
@@ -178,7 +177,7 @@ void qspNewGame(QSP_BOOL isReset)
 	qspRefreshCurLoc(QSP_TRUE, 0, 0);
 }
 
-INLINE FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
+FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 {
 	FILE *ret;
 	char *mode;
