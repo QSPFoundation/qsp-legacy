@@ -19,45 +19,40 @@
 #include "locations.h"
 #include "text.h"
 
-int qspErrorNum = 0;
 QSPErrorInfo qspLastError;
-
+int qspErrorNum = 0;
+int qspErrorLoc = -1;
+int qspErrorLine = 0;
+int qspErrorActIndex = -1;
 int qspRealCurLoc = -1;
+int qspRealLine = 0;
 int qspRealActIndex = -1;
-int qspRealLineNum = 0;
-QSPLineOfCode *qspRealLine = 0;
 
 void qspSetError(int num)
 {
 	if (!qspErrorNum)
 	{
 		qspErrorNum = num;
+		qspErrorLoc = qspRealCurLoc;
+		qspErrorActIndex = qspRealActIndex;
+		qspErrorLine = qspRealLine;
+
 		qspLastError.ErrorNum = num;
 		qspLastError.ErrorDesc = qspGetErrorDesc(num);
 		qspLastError.ActIndex = qspRealActIndex;
-		qspLastError.TopLineNum = qspRealLineNum;
 
 		if (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount)
 		{
 			if (qspLastError.LocName) free(qspLastError.LocName);
-			qspLastError.LocName = qspGetNewText(qspLocs[qspRealCurLoc].Name, -1);
+			qspLastError.LocName = qspGetNewText(qspLocs[qspErrorLoc].Name, -1);
 		}
 		else
 		{
 			if (qspLastError.LocName) free(qspLastError.LocName);
 		}
 
-		if (qspRealLine)
-		{
-			qspLastError.IntLineNum = qspRealLine->LineNum + 1;
-			if (qspLastError.IntLine) free(qspLastError.IntLine);
-			qspLastError.IntLine = qspGetNewText(qspRealLine->Str, -1);
-		}
-		else
-		{
-			qspLastError.IntLineNum = 0;
-			if (qspLastError.IntLine) free(qspLastError.IntLine);
-		}
+		qspLastError.IntLineNum = qspRealLine ? qspRealLine : 0;
+		if (qspLastError.IntLine) free(qspLastError.IntLine);
 	}
 }
 
