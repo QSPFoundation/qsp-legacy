@@ -22,15 +22,9 @@
 	static int qspEndiannessTestValue = 1;
 
 	#ifdef _UNICODE
-		#ifdef _WIN32
-			typedef wchar_t QSP_CHAR;
-			#define QSP_FMT2(x) L##x
-			#define QSP_FMT(x) QSP_FMT2(x)
-		#else
-			typedef unsigned short QSP_CHAR;
-			#define QSP_FMT2(x) u##x
-			#define QSP_FMT(x) QSP_FMT2(x)
-		#endif
+		typedef unsigned short QSP_CHAR;
+		#define QSP_FMT2(x) u##x
+		#define QSP_FMT(x) QSP_FMT2(x)
 
 		#define QSP_STRCOLL qspStrsComp
 		#define QSP_CHRLWR qspToWLower

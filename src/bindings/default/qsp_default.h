@@ -21,15 +21,9 @@
 	static int qspEndiannessTestValue = 1;
 
 	#ifdef _UNICODE
-		#ifdef _WIN32
-			typedef wchar_t QSP_CHAR;
-			#define QSP_FMT2(x) L##x
-			#define QSP_FMT(x) QSP_FMT2(x)
-		#else
-			typedef unsigned short QSP_CHAR;
-			#define QSP_FMT2(x) u##x
-			#define QSP_FMT(x) QSP_FMT2(x)
-		#endif
+		typedef unsigned short QSP_CHAR;
+		#define QSP_FMT2(x) u##x
+		#define QSP_FMT(x) QSP_FMT2(x)
 
 		#define QSP_STRCOLL qspStrsComp
 		#define QSP_CHRLWR qspToWLower
@@ -100,9 +94,9 @@
 	{
 	#endif
 
-	void qspOpenQuestFromFILE(FILE *, const QSP_CHAR *, QSP_BOOL);
-	void qspSaveGameStatusToFILE(FILE *);
-	void qspOpenGameStatusFromFILE(FILE *);
+	QSP_LEGACY_EXTERN void qspOpenQuestFromFILE(FILE *, const QSP_CHAR *, QSP_BOOL);
+	QSP_LEGACY_EXTERN void qspSaveGameStatusToFILE(FILE *);
+	QSP_LEGACY_EXTERN void qspOpenGameStatusFromFILE(FILE *);
 
 	QSP_LEGACY_EXTERN void QSPInit();
 	QSP_LEGACY_EXTERN void QSPTerminate();
