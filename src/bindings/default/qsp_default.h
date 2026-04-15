@@ -140,8 +140,8 @@
 	QSP_LEGACY_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPExecLocationCode(const QSP_CHAR *name, QSP_BOOL isRefresh);
 	/* Errors */
-	QSP_LEGACY_EXTERN void QSPGetLastErrorData(int *errorNum, QSP_CHAR **errorLoc, int *errorActIndex, int *errorLine);
-	QSP_LEGACY_EXTERN const QSP_CHAR *QSPGetErrorDesc(int errorNum);
+	QSP_LEGACY_EXTERN QSPErrorInfo QSPGetLastErrorData(void);
+	QSP_LEGACY_EXTERN QSP_CHAR *QSPGetErrorDesc(int errorNum);
 	/* Game */
 	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *file, QSP_BOOL isAddLocs);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *file, QSP_BOOL isAddLocs);

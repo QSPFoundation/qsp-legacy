@@ -96,4 +96,15 @@
 		QSP_CHAR *Image;
 	} QSPListItem;
 
+	typedef struct
+	{
+		int ErrorNum;
+		QSP_CHAR *ErrorDesc;
+		QSP_CHAR *LocName; /* location name */
+		int ActIndex; /* index of the base action */
+		int TopLineNum; /* top-level line within the game code */
+		int IntLineNum; /* line number of the actual code */
+		QSP_CHAR *IntLine; /* line of the actual code */
+	} QSPErrorInfo;
+
 #endif
