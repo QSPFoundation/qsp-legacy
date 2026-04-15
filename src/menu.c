@@ -19,6 +19,7 @@
 #include "callbacks.h"
 #include "errors.h"
 #include "game.h"
+#include "locations.h"
 #include "text.h"
 #include "variables.h"
 
@@ -40,6 +41,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 {
 	int ind, maxItems, len;
 	QSPVar *var;
+	QSPListItem menuItems[QSP_MAXMENUITEMS];
 	QSP_CHAR *imgPath, *str, *pos, *pos2;
 	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
@@ -88,11 +90,27 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 		}
 		qspCurMenuLocs[qspCurMenuItems++] = qspGetNewText(pos + 1, len);
 		*pos = 0;
-		qspCallAddMenuItem(str, imgPath);
+		menuItems[qspCurMenuItems].Name = str;
+		menuItems[qspCurMenuItems].Image = imgPath;
 		*pos = QSP_MENUDELIM[0];
 		if (imgPath) free(imgPath);
 		++ind;
 	}
-	if (qspCurMenuItems) qspCallShowMenu();
+
+	if (qspCurMenuItems)
+	{
+		int oldLocationState = qspRefreshCount;
+		ind = qspCallShowMenu(menuItems, qspCurMenuItems);
+		if (qspRefreshCount != oldLocationState) return QSP_FALSE;
+		if (ind >= 0 && ind < qspCurMenuItems)
+		{
+			if (qspIsDisableCodeExec) return QSP_FALSE;
+			QSPVariant arg;
+			arg.IsStr = QSP_FALSE;
+			QSP_NUM(arg) = ind + 1;
+			qspExecLocByNameWithArgs(qspCurMenuLocs[ind], &arg, 1);
+		}
+	}
+
 	return QSP_FALSE;
 }

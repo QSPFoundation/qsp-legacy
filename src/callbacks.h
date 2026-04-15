@@ -45,13 +45,12 @@
 	void qspCallSetTimer(int);
 	void qspCallRefreshInt(QSP_BOOL);
 	void qspCallSetInputStrText(QSP_CHAR *);
-	void qspCallAddMenuItem(QSP_CHAR *, QSP_CHAR *);
 	void qspCallSystem(QSP_CHAR *);
 	void qspCallOpenQuest(QSP_CHAR *, QSP_BOOL);
 	void qspCallOpenGame(QSP_CHAR *);
 	void qspCallSaveGame(QSP_CHAR *);
 	void qspCallShowMessage(QSP_CHAR *);
-	void qspCallShowMenu();
+	int qspCallShowMenu(QSPListItem *, int);
 	void qspCallShowPicture(QSP_CHAR *);
 	void qspCallShowWindow(int, QSP_BOOL);
 	void qspCallPlayFile(QSP_CHAR *, int);

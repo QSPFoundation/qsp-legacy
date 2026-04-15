@@ -88,18 +88,6 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 	}
 }
 
-void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
-{
-	/* Here we add a menu item */
-	QSPCallState state;
-	if (qspCallBacks[QSP_CALL_ADDMENUITEM])
-	{
-		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_ADDMENUITEM](name, imgPath);
-		qspRestoreCallState(&state);
-	}
-}
-
 void qspCallSystem(QSP_CHAR *cmd)
 {
 	/* Here we make a system call */
@@ -162,16 +150,19 @@ void qspCallShowMessage(QSP_CHAR *text)
 	}
 }
 
-void qspCallShowMenu()
+int qspCallShowMenu(QSPListItem *items, int count)
 {
 	/* Here we show the menu */
-	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWMENU])
 	{
+		QSPCallState state;
+		int index;
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		qspCallBacks[QSP_CALL_SHOWMENU]();
+		index = qspCallBacks[QSP_CALL_SHOWMENU](items, count);
 		qspRestoreCallState(&state);
+		return index;
 	}
+	return -1;
 }
 
 void qspCallShowPicture(QSP_CHAR *file)

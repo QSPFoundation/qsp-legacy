@@ -157,8 +157,6 @@
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, int ind, int *numVal, QSP_CHAR **strVal);
 	QSP_LEGACY_EXTERN int QSPGetMaxVarsCount();
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetVarNameByIndex(int ind, QSP_CHAR **name);
-	/* Menu */
-	QSP_LEGACY_EXTERN void QSPSelectMenuItem(int ind);
 
 	QSP_LEGACY_EXTERN int QSPGetFullRefreshCount();
 	QSP_LEGACY_EXTERN const QSP_CHAR *QSPGetQstFullPath();

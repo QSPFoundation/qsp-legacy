@@ -543,20 +543,6 @@ QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
-/* Menu */
-/* This function is intended solely for use with the QSP_CALL_SHOWMENU callback */
-void QSPSelectMenuItem(int index)
-{
-	QSPVariant arg;
-	if (index >= 0 && index < qspCurMenuItems)
-	{
-		if (qspIsDisableCodeExec) return;
-		arg.IsStr = QSP_FALSE;
-		QSP_NUM(arg) = index + 1;
-		qspExecLocByNameWithArgs(qspCurMenuLocs[index], &arg, 1);
-	}
-}
-/* ------------------------------------------------------------ */
 /* Configure callbacks */
 void QSPSetCallBack(int type, QSP_CALLBACK func)
 {
