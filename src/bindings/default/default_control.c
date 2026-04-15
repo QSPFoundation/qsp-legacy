@@ -408,7 +408,7 @@ const QSP_CHAR *QSPGetErrorDesc(int errorNum)
 /* Game controls */
 
 /* Load new game from file */
-QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fileName)
+QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 {
 	if (fileName == NULL) return QSP_FALSE;
 
@@ -424,7 +424,7 @@ QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fileName)
 		return QSP_FALSE;
 	}
 
-	qspOpenQuestFromFILE(f, fileName, QSP_FALSE);
+	qspOpenQuestFromFILE(f, fileName, isAddLocs);
 
 	fclose(f);
 
@@ -433,12 +433,12 @@ QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fileName)
 	return QSP_TRUE;
 }
 /* Load game from memory */
-QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *fileName)
+QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 {
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	qspOpenQuestFromData((char *)data, dataSize, (QSP_CHAR *)fileName, QSP_FALSE);
+	qspOpenQuestFromData((char *)data, dataSize, (QSP_CHAR *)fileName, isAddLocs);
 	if (qspErrorNum) return QSP_FALSE;
 	return QSP_TRUE;
 }

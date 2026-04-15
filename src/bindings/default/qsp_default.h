@@ -143,12 +143,12 @@
 	QSP_LEGACY_EXTERN void QSPGetLastErrorData(int *errorNum, QSP_CHAR **errorLoc, int *errorActIndex, int *errorLine);
 	QSP_LEGACY_EXTERN const QSP_CHAR *QSPGetErrorDesc(int errorNum);
 	/* Game */
-	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *file);
-	QSP_LEGACY_EXTERN QSP_BOOL QSPSaveGameAsData(QSP_CHAR *strBuf, int strBufSize, int *realSize, QSP_BOOL isRefresh);
-	QSP_LEGACY_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const QSP_CHAR *str, QSP_BOOL isRefresh);
-	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *file);
+	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *file, QSP_BOOL isAddLocs);
+	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *file, QSP_BOOL isAddLocs);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPSaveGameAsFile(const QSP_CHAR *file, QSP_BOOL isRefresh);
+	QSP_LEGACY_EXTERN QSP_BOOL QSPSaveGameAsData(QSP_CHAR *strBuf, int strBufSize, int *realSize, QSP_BOOL isRefresh);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPOpenSavedGameFromFile(const QSP_CHAR *file, QSP_BOOL isRefresh);
+	QSP_LEGACY_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const QSP_CHAR *str, QSP_BOOL isRefresh);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
 	/* Variables */
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, int *count);
