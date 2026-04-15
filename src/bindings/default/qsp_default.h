@@ -94,10 +94,6 @@
 	{
 	#endif
 
-	QSP_LEGACY_EXTERN void qspOpenQuestFromFILE(FILE *, const QSP_CHAR *, QSP_BOOL);
-	QSP_LEGACY_EXTERN void qspSaveGameStatusToFILE(FILE *);
-	QSP_LEGACY_EXTERN void qspOpenGameStatusFromFILE(FILE *);
-
 	QSP_LEGACY_EXTERN void QSPInit();
 	QSP_LEGACY_EXTERN void QSPTerminate();
 	QSP_LEGACY_EXTERN QSP_BOOL QSPIsInCallBack();
