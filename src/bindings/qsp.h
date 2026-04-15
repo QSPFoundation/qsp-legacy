@@ -18,7 +18,7 @@
 #ifndef QSP_H
 	#define QSP_H
 
-    #include "qsplegacy_export.h"
+    #include "qsp_legacy_export.h"
 
 	enum
 	{

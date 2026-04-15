@@ -112,10 +112,7 @@ set(QSP_LEGACY_SOURCES
 )
 add_library(qsp-legacy SHARED ${QSP_LEGACY_SOURCES})
 target_compile_features(qsp-legacy PRIVATE c_std_17)
-set_target_properties(qsp-legacy PROPERTIES
-		C_STANDARD 17
-		C_STANDARD_REQUIRED ON
-)
+set_target_properties(qsp-legacy PROPERTIES C_STANDARD 17 C_STANDARD_REQUIRED ON)
 target_compile_definitions(qsp-legacy PUBLIC _UNICODE)
 if (WIN32)
 	target_compile_definitions(qsp-legacy PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -141,7 +138,7 @@ target_include_directories(qsp-legacy
 )
 
 generate_export_header(qsp-legacy
-		BASE_NAME QspLegacy
+		BASE_NAME Qsp_Legacy
 		EXPORT_MACRO_NAME QSP_LEGACY_EXTERN
 )
 
