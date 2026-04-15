@@ -17,9 +17,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-set(TARGET qsp-legacy PROPERTY CMAKE_C_STANDARD 17)
-set(TARGET qsp-legacy PROPERTY CMAKE_C_STANDARD_REQUIRED ON)
-
 set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
@@ -115,6 +112,10 @@ set(QSP_LEGACY_SOURCES
 		src/variant.c src/variant.h
 )
 add_library(qsp-legacy SHARED ${QSP_LEGACY_SOURCES})
+set_target_properties(qsp-legacy PROPERTIES
+		C_STANDARD 17
+		C_STANDARD_REQUIRED ON
+)
 target_compile_definitions(qsp-legacy PUBLIC _UNICODE)
 if (WIN32)
 	target_compile_definitions(qsp-legacy PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -135,8 +136,8 @@ target_include_directories(qsp-legacy
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/default>"
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/bindings>"
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/src>"
-		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/src/default>"
+		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp-legacy>"
+		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp-legacy/default>"
 )
 
 generate_export_header(qsp-legacy
@@ -174,11 +175,11 @@ install(FILES
 		src/bindings/bindings_config.h
 		"${CMAKE_CURRENT_BINARY_DIR}/qsp_legacy_export.h"
 		DESTINATION
-		"${CMAKE_INSTALL_INCLUDEDIR}/src"
+		"${CMAKE_INSTALL_INCLUDEDIR}/qsp-legacy"
 )
 
 install(FILES
 		src/bindings/default/qsp_default.h
 		DESTINATION
-		"${CMAKE_INSTALL_INCLUDEDIR}/src/default"
+		"${CMAKE_INSTALL_INCLUDEDIR}/qsp-legacy/default"
 )
