@@ -38,19 +38,25 @@ void qspSetError(int num)
 		qspLastError.TopLineNum = qspRealLineNum;
 
 		if (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount)
-			qspStrCopy(&qspLastError.LocName, qspLocs[qspRealCurLoc].Name);
+		{
+			if (qspLastError.LocName) free(qspLastError.LocName);
+			qspLastError.LocName = qspGetNewText(qspLocs[qspRealCurLoc].Name, -1);
+		}
 		else
-			qspClearText(&qspLastError.LocName, 0);
+		{
+			if (qspLastError.LocName) free(qspLastError.LocName);
+		}
 
 		if (qspRealLine)
 		{
 			qspLastError.IntLineNum = qspRealLine->LineNum + 1;
-			qspStrCopy(&qspLastError.IntLine, qspRealLine->Str);
+			if (qspLastError.IntLine) free(qspLastError.IntLine);
+			qspLastError.IntLine = qspGetNewText(qspRealLine->Str, -1);
 		}
 		else
 		{
 			qspLastError.IntLineNum = 0;
-			qspClearText(&qspLastError.IntLine, 0);
+			if (qspLastError.IntLine) free(qspLastError.IntLine);
 		}
 	}
 }

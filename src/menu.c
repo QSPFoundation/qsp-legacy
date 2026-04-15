@@ -90,10 +90,9 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 		}
 		qspCurMenuLocs[qspCurMenuItems++] = qspGetNewText(pos + 1, len);
 		*pos = 0;
-		menuItems[qspCurMenuItems].Name = str;
+		menuItems[qspCurMenuItems].Name = qspGetNewText(str, -1);
 		menuItems[qspCurMenuItems].Image = imgPath;
 		*pos = QSP_MENUDELIM[0];
-		if (imgPath) free(imgPath);
 		++ind;
 	}
 
