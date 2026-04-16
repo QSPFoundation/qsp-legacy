@@ -45,7 +45,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 	QSP_CHAR *imgPath, *str, *pos, *pos2;
 	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
-	qspCallDeleteMenu();
+
 	if (count == 1)
 	{
 		ind = 0;
