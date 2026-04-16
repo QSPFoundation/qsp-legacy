@@ -102,6 +102,10 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 	{
 		int oldLocationState = qspRefreshCount;
 		ind = qspCallShowMenu(menuItems, qspCurMenuItems);
+		for (int i = 0; i < qspCurMenuItems; ++i) {
+			free(menuItems[i].Name);
+			if (menuItems[i].Image) free(menuItems[i].Image);
+		}
 		if (qspRefreshCount != oldLocationState) return QSP_FALSE;
 		if (ind >= 0 && ind < qspCurMenuItems)
 		{
