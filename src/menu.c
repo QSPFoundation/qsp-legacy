@@ -88,11 +88,13 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 			len = -1;
 			imgPath = 0;
 		}
-		qspCurMenuLocs[qspCurMenuItems++] = qspGetNewText(pos + 1, len);
+		int curr = qspCurMenuItems;
+		qspCurMenuLocs[curr] = qspGetNewText(pos + 1, len);
 		*pos = 0;
-		menuItems[qspCurMenuItems].Name = qspGetNewText(str, -1);
-		menuItems[qspCurMenuItems].Image = imgPath;
+		menuItems[curr].Name = qspGetNewText(str, -1);
+		menuItems[curr].Image = imgPath;
 		*pos = QSP_MENUDELIM[0];
+		qspCurMenuItems++;
 		++ind;
 	}
 
