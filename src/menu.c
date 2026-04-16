@@ -31,16 +31,16 @@ INLINE void qspFreeMenuItems(QSPListItem *items, int count)
 	QSPListItem *curItem;
 	for (curItem = items; count > 0; --count, ++curItem)
 	{
-		if (curItem->Name) free(curItem->Name);
+		free(curItem->Name);
 		if (curItem->Image) free(curItem->Image);
 	}
 }
 
 INLINE void qspFreeMenuLocs(QSP_CHAR **locs, int count)
 {
-	QSP_CHAR **curLoc;
-	for (curLoc = locs; count > 0; --count, ++curLoc)
-		if (curLoc) free(curLoc);
+	int i;
+	for (i = 0; i < count; ++i)
+		free(locs[i]);
 }
 
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
