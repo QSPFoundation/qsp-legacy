@@ -197,16 +197,40 @@ void qspCallShowMessage(QSP_CHAR* text)
 	}
 }
 
-void qspCallShowMenu()
+int qspCallShowMenu(QSPListItem *items, int count)
 {
 	if (qspCallBacks[QSP_CALL_SHOWMENU]) {
 		QSPCallState state;
+		int i, index;
+		JNIListItem *jniItems;
+		jobjectArray jniMenuArray;
 		JNIEnv *javaEnv = ndkGetJniEnv();
 
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		(*javaEnv)->CallVoidMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_SHOWMENU]);
+
+		/* Allocate an array */
+		jniItems = (JNIListItem *)malloc(count * sizeof(JNIListItem));
+		jniMenuArray = (*javaEnv)->NewObjectArray(javaEnv, count, ndkListItemClass, 0);
+		for (i = 0; i < count; ++i)
+		{
+			jniItems[i] = ndkToJavaListItem(javaEnv, items[i].Name, items[i].Image);
+			(*javaEnv)->SetObjectArrayElement(javaEnv, jniMenuArray, i, jniItems[i].ListItem);
+		}
+
+		/* Process user input */
+		index = (*javaEnv)->CallIntMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_SHOWMENU], jniMenuArray);
+
+		/* Deallocate the resources */
+		for (i = 0; i < count; ++i)
+			ndkReleaseJavaListItem(javaEnv, jniItems + i);
+		(*javaEnv)->DeleteLocalRef(javaEnv, jniMenuArray);
+		free(jniItems);
+
 		qspRestoreCallState(&state);
+
+		return index;
 	}
+	return -1;
 }
 
 void qspCallShowPicture(QSP_CHAR* file)
@@ -307,18 +331,6 @@ void qspCallCloseFile(QSP_CHAR* file)
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
 		(*javaEnv)->CallVoidMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_CLOSEFILE], qspText);
 		(*javaEnv)->DeleteLocalRef(javaEnv, qspText);
-		qspRestoreCallState(&state);
-	}
-}
-
-void qspCallDeleteMenu(void)
-{
-	if (qspCallBacks[QSP_CALL_DELETEMENU]) {
-		QSPCallState state;
-		JNIEnv *javaEnv = ndkGetJniEnv();
-
-		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		(*javaEnv)->CallVoidMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_DELETEMENU]);
 		qspRestoreCallState(&state);
 	}
 }

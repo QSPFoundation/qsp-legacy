@@ -255,18 +255,6 @@ void qspCallCloseFile(QSP_CHAR *file)
 	}
 }
 
-void qspCallDeleteMenu()
-{
-	/* Here we delete the current menu */
-	QSPCallState state;
-	if (qspCallBacks[QSP_CALL_DELETEMENU])
-	{
-		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_DELETEMENU]();
-		qspRestoreCallState(&state);
-	}
-}
-
 QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 {
 	/* Here we enter the text */

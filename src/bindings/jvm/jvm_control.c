@@ -462,20 +462,6 @@ JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getErrorDesc(JNIEnv *en
 	return ndkToJavaString(env, qspGetErrorDesc(errorNum));
 }
 /* ------------------------------------------------------------ */
-/* Menu */
-JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_selectMenuItem(JNIEnv *env, jobject this, jint ind)
-{
-	QSPVariant arg;
-	if (ind >= 0 && ind < qspCurMenuItems)
-	{
-		if (qspIsDisableCodeExec) return;
-		arg.IsStr = QSP_FALSE;
-		QSP_NUM(arg) = ind + 1;
-		qspExecLocByNameWithArgs(qspCurMenuLocs[ind], &arg, 1);
-	}
-}
-
-/* ------------------------------------------------------------ */
 /* Game Management */
 
 #ifdef __ANDROID__
@@ -820,7 +806,6 @@ JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_init(JNIEnv *env, jobject 
 	qspSetCallBack(QSP_CALL_SLEEP, (*env)->GetMethodID(env, ndkApiClass, "onSleep", "(I)V"));
 	qspSetCallBack(QSP_CALL_GETMSCOUNT, (*env)->GetMethodID(env, ndkApiClass, "onGetMsCount", "()I"));
 	qspSetCallBack(QSP_CALL_INPUTBOX, (*env)->GetMethodID(env, ndkApiClass, "onInputBox", "(Ljava/lang/String;)Ljava/lang/String;"));
-	qspSetCallBack(QSP_CALL_ADDMENUITEM, (*env)->GetMethodID(env, ndkApiClass, "onAddMenuItem", "(Ljava/lang/String;Ljava/lang/String;)V"));
 	qspSetCallBack(QSP_CALL_CHANGEQUESTPATH, (*env)->GetMethodID(env, ndkApiClass, "onChangeQuestPath", "(Ljava/lang/String;)V"));
 }
 

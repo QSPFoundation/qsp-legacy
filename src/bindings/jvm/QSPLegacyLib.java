@@ -1,14 +1,14 @@
-package com.libsdhqs.jni;
+package com.libqsplegacy.jni;
 
-public abstract class QSLibSDH {
+public abstract class QSPLegacyLib {
 
-    public record ListItem(String image,  String text) { }
+    public record ListItem(String image, String text) { }
     public record ExecutionState(String loc, int actIndex, int lineNum) { }
     public record VarValResp(boolean isSuccess, String stringValue, int intValue) { }
     public record ErrorData(String locName, int errorNum, int index, int line) { }
 
     static {
-        System.loadLibrary("qslibsdh");
+        System.loadLibrary("qsp-legacy");
     }
 
     // --- Lifecycle and State ---
@@ -78,9 +78,6 @@ public abstract class QSLibSDH {
     public native boolean openSavedGameFromFD(int fileDescriptor, boolean isRefresh);
     public native boolean openSavedGameFromPath(String filePath, boolean isRefresh);
 
-    // --- Menu ---
-    public native void selectMenuItem(int index);
-
     // --- Callbacks from Native Code ---
     public void onCallDebug(String str) {}
     public void onRefreshInt() {}
@@ -93,7 +90,7 @@ public abstract class QSLibSDH {
     public boolean onIsPlayingFile(String path) { return false; }
     public void onCloseFile(String path) {}
 
-    public void onOpenGame(String file, boolean isNewGame) {}
+    public void onOpenGame(String file, boolean isAddLocs) {}
     public void onOpenGameStatus(String filename) {}
     public void onSaveGameStatus(String filename) {}
 
@@ -103,10 +100,7 @@ public abstract class QSLibSDH {
     public int onGetMsCount() { return 0; }
     public void onSleep(int msecs) {}
 
-    public void onAddMenuItem(String name, String imgPath) {}
-    public void onShowMenuOld() {}
-    public int onShowMenuNew() { return -1; }
-    public void onDeleteMenu() {}
+    public int onShowMenu(ListItem[] items) { return -1; }
 
     public void onChangeQuestPath(String path) {}
 }

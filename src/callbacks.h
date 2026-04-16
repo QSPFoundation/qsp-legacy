@@ -58,7 +58,6 @@
 	void qspCallSleep(int);
 	int qspCallGetMSCount();
 	void qspCallCloseFile(QSP_CHAR *);
-	void qspCallDeleteMenu();
 	QSP_CHAR *qspCallInputBox(QSP_CHAR *);
 	void qspCallChangeQuestPath(QSP_CHAR *);
 

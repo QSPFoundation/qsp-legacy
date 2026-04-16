@@ -80,8 +80,12 @@
 
 	char *qspW2C(QSP_CHAR *);
 	QSP_CHAR *qspC2W(char *);
+
 	jstring ndkToJavaString(JNIEnv *env, QSP_CHAR *str);
 	QSP_CHAR *ndkFromJavaString(JNIEnv *env, jstring str);
+
+	JNIListItem ndkToJavaListItem(JNIEnv *env, QSP_CHAR *name, QSP_CHAR *image);
+	void ndkReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem);
 
 	void qspOpenQuestFromFILE(FILE *, QSP_CHAR *, QSP_BOOL);
 	void qspSaveGameStatusToFILE(FILE *);
