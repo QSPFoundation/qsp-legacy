@@ -23,28 +23,34 @@
 #include "text.h"
 #include "variables.h"
 
-QSP_CHAR *qspCurMenuLocs[QSP_MAXMENUITEMS];
-int qspCurMenuItems = 0;
+INLINE void qspFreeMenuItems(QSPListItem *items, int count);
+INLINE void qspFreeMenuLocs(QSP_CHAR **locs, int count);
 
-void qspClearMenu(QSP_BOOL isFirst)
+INLINE void qspFreeMenuItems(QSPListItem *items, int count)
 {
-	int i;
-	if (!isFirst)
+	QSPListItem *curItem;
+	for (curItem = items; count > 0; --count, ++curItem)
 	{
-		for (i = 0; i < qspCurMenuItems; ++i)
-			free(qspCurMenuLocs[i]);
+		if (curItem->Name) free(curItem->Name);
+		if (curItem->Image) free(curItem->Image);
 	}
-	qspCurMenuItems = 0;
+}
+
+INLINE void qspFreeMenuLocs(QSP_CHAR **locs, int count)
+{
+	QSP_CHAR **curLoc;
+	for (curLoc = locs; count > 0; --count, ++curLoc)
+		if (curLoc) free(curLoc);
 }
 
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
-	int ind, maxItems, len;
+	int ind, itemsCount, maxItems, len;
 	QSPVar *var;
 	QSPListItem menuItems[QSP_MAXMENUITEMS];
+	QSP_CHAR *menuLocs[QSP_MAXMENUITEMS];
 	QSP_CHAR *imgPath, *str, *pos, *pos2;
 	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
-	qspClearMenu(QSP_FALSE);
 
 	if (count == 1)
 	{
@@ -63,16 +69,18 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 			if (maxItems < 0) maxItems = 0;
 		}
 	}
+
+	itemsCount = 0;
 	while (ind < var->ValsCount)
 	{
-		if (qspCurMenuItems == maxItems) break;
+		if (itemsCount == maxItems) break;
 		if (!((str = var->Values[ind].Str) && qspIsAnyString(str))) break;
 		if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM, 0)))
 		{
 			qspSetError(QSP_ERR_COLONNOTFOUND);
 			return QSP_FALSE;
 		}
-		if (qspCurMenuItems == QSP_MAXMENUITEMS)
+		if (itemsCount == QSP_MAXMENUITEMS)
 		{
 			qspSetError(QSP_ERR_CANTADDMENUITEM);
 			return QSP_FALSE;
@@ -88,33 +96,31 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 			len = -1;
 			imgPath = 0;
 		}
-		int curr = qspCurMenuItems;
-		qspCurMenuLocs[curr] = qspGetNewText(pos + 1, len);
+		int curr = itemsCount;
+		menuLocs[curr] = qspGetNewText(pos + 1, len);
 		*pos = 0;
 		menuItems[curr].Name = qspGetNewText(str, -1);
 		menuItems[curr].Image = imgPath;
 		*pos = QSP_MENUDELIM[0];
-		qspCurMenuItems++;
+		itemsCount++;
 		++ind;
 	}
 
-	if (qspCurMenuItems)
+	if (itemsCount)
 	{
 		int oldLocationState = qspRefreshCount;
-		ind = qspCallShowMenu(menuItems, qspCurMenuItems);
-		for (int i = 0; i < qspCurMenuItems; ++i) {
-			free(menuItems[i].Name);
-			if (menuItems[i].Image) free(menuItems[i].Image);
-		}
+		ind = qspCallShowMenu(menuItems, itemsCount);
+		qspFreeMenuItems(menuItems, itemsCount);
 		if (qspRefreshCount != oldLocationState) return QSP_FALSE;
-		if (ind >= 0 && ind < qspCurMenuItems)
+		if (ind >= 0 && ind < itemsCount)
 		{
 			if (qspIsDisableCodeExec) return QSP_FALSE;
 			QSPVariant arg;
 			arg.IsStr = QSP_FALSE;
 			QSP_NUM(arg) = ind + 1;
-			qspExecLocByNameWithArgs(qspCurMenuLocs[ind], &arg, 1);
+			qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1);
 		}
+		qspFreeMenuLocs(menuLocs, itemsCount);
 	}
 
 	return QSP_FALSE;
