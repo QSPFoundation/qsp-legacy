@@ -15,17 +15,21 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include <stddef.h>
-
 #ifndef QSP_DEFAULTDEFINES
 	#define QSP_DEFAULTDEFINES
 
 	static int qspEndiannessTestValue = 1;
 
 	#ifdef _UNICODE
-		typedef wchar_t QSP_CHAR;
-		#define QSP_FMT2(x) L##x
-		#define QSP_FMT(x) QSP_FMT2(x)
+		#ifdef _WIN32
+			typedef wchar_t QSP_CHAR;
+			#define QSP_FMT2(x) L##x
+			#define QSP_FMT(x) QSP_FMT2(x)
+		#else
+			typedef unsigned short QSP_CHAR;
+			#define QSP_FMT2(x) u##x
+			#define QSP_FMT(x) QSP_FMT2(x)
+		#endif
 
 		#define QSP_ONIG_ENC ((*(unsigned char *)&(qspEndiannessTestValue) == 1) ? \
                              (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
