@@ -37,7 +37,6 @@
 
 	/* External functions */
 	FILE *qspFileOpen(QSP_CHAR *, QSP_CHAR *);
-	QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
     QSP_CHAR *qspGetPathAsIs(QSP_CHAR *path);
 	void qspClearIncludes(QSP_BOOL);
 	void qspNewGame(QSP_BOOL);

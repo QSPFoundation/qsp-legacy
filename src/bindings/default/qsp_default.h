@@ -148,7 +148,6 @@
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetVarNameByIndex(int ind, QSP_CHAR **name);
 
 	QSP_LEGACY_EXTERN int QSPGetFullRefreshCount();
-	QSP_LEGACY_EXTERN const QSP_CHAR *QSPGetQstFullPath();
 	QSP_LEGACY_EXTERN const QSP_CHAR *QSPGetCurLoc();
 	QSP_LEGACY_EXTERN QSP_BOOL QSPGetExprValue(const QSP_CHAR *str, QSP_BOOL *isString, int *numVal, QSP_CHAR *strVal, int strValBufSize);
 

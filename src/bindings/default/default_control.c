@@ -125,12 +125,6 @@ int QSPGetFullRefreshCount()
 	return qspFullRefreshCount;
 }
 /* ------------------------------------------------------------ */
-/* Full path to the downloaded game file */
-const QSP_CHAR *QSPGetQstFullPath()
-{
-	return qspQstFullPath;
-}
-/* ------------------------------------------------------------ */
 /* Current location */
 const QSP_CHAR *QSPGetCurLoc()
 {
