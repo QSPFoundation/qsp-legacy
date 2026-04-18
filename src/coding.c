@@ -293,62 +293,10 @@ QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
 
 char *qspFromQSPString(QSP_CHAR *s)
 {
-#ifndef _UNICODE
-	return qspGetNewText(s, -1);
-#endif
-	if (sizeof(QSP_CHAR) == sizeof(wchar_t))
-	{
-		int len = QSP_WCSTOMBSLEN((wchar_t *)s) + 1;
-		char *ret = (char *)malloc(len);
-		QSP_WCSTOMBS(ret, (wchar_t *)s, len);
-		return ret;
-	}
-	if (sizeof(QSP_CHAR) == 2)
-	{
-		QSP_CHAR *ptr;
-		unsigned int codepoint = 0;
-		int len = 0, maxLen = qspStrLen(s) * 4; /* we're very conservative here */
-		char *ret = (char *)malloc(maxLen + 1);
-		ret[maxLen] = 0;
-		for (ptr = s; *ptr; ++ptr)
-		{
-			if (*ptr >= 0xd800 && *ptr <= 0xdbff)
-				codepoint = ((*ptr - 0xd800) << 10) + 0x10000;
-			else
-			{
-				if (*ptr >= 0xdc00 && *ptr <= 0xdfff)
-					codepoint |= *ptr - 0xdc00;
-				else
-					codepoint = *ptr;
-
-				if (codepoint <= 0x7f)
-					ret[len++] = (char)codepoint;
-				else if (codepoint <= 0x7ff)
-				{
-					ret[len++] = (char)(0xc0 | ((codepoint >> 6) & 0x1f));
-					ret[len++] = (char)(0x80 | (codepoint & 0x3f));
-				}
-				else if (codepoint <= 0xffff)
-				{
-					ret[len++] = (char)(0xe0 | ((codepoint >> 12) & 0x0f));
-					ret[len++] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
-					ret[len++] = (char)(0x80 | (codepoint & 0x3f));
-				}
-				else
-				{
-					/* We don't support this case, keeping it for the future */
-					ret[len++] = (char)(0xf0 | ((codepoint >> 18) & 0x07));
-					ret[len++] = (char)(0x80 | ((codepoint >> 12) & 0x3f));
-					ret[len++] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
-					ret[len++] = (char)(0x80 | (codepoint & 0x3f));
-				}
-				codepoint = 0;
-			}
-		}
-		ret[len] = 0;
-		return ret;
-	}
-	return 0;
+	int len = QSP_WCSTOMBSLEN(s) + 1;
+	char *ret = (char *)malloc(len);
+	QSP_WCSTOMBS(ret, s, len);
+	return ret;
 }
 
 INLINE char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)

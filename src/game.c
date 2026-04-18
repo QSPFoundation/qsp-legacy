@@ -237,7 +237,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 	if (!qspCheckQuest(strs, count, isUCS2))
 	{
 		qspSetError(QSP_ERR_CANTLOADFILE);
-		qspFreeStrs((void **)strs, count);
+		qspFreeStrs(strs, count);
 		return;
 	}
 	buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
@@ -302,7 +302,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 		else
 			ind += actsCount * (isOldFormat ? 2 : 3);
 	}
-	qspFreeStrs((void **)strs, count);
+	qspFreeStrs(strs, count);
 	qspLocsCount = end;
 	qspCreateWorld(end, locsCount);
 	count = locsCount - start;
@@ -476,7 +476,7 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	if (!qspCheckGameStatus(strs, count))
 	{
 		qspSetError(QSP_ERR_CANTLOADFILE);
-		qspFreeStrs((void **)strs, count);
+		qspFreeStrs(strs, count);
 		return;
 	}
 	++qspRefreshCount;
@@ -575,7 +575,7 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 			}
 		}
 	}
-	qspFreeStrs((void **)strs, count);
+	qspFreeStrs(strs, count);
 	qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_TRUE;
 	qspOpenIncludes();
 	if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
