@@ -30,9 +30,6 @@
 #include "time.h"
 #include "variables.h"
 
-QSP_CHAR *qspQstPath = 0;
-int qspQstPathLen = 0;
-QSP_CHAR *qspQstFullPath = 0;
 int qspQstCRC = 0;
 
 QSP_CHAR *qspCurIncFiles[QSP_MAXINCFILES];
@@ -92,12 +89,6 @@ INLINE int qspCRC(void *data, int len)
 	return crc;
 }
 
-QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *path)
-{
-	QSP_CHAR *absPath = qspGetNewText(qspQstPath, qspQstPathLen);
-	return qspGetAddText(absPath, path, qspQstPathLen, -1);
-}
-
 QSP_CHAR *qspGetPathAsIs(QSP_CHAR *path)
 {
     QSP_CHAR *newPath;
@@ -131,7 +122,7 @@ INLINE void qspIncludeFile(QSP_CHAR *s)
 		return;
 	}
 	int oldCurIncLocsCount = qspCurIncLocsCount;
-	QSP_CHAR *file = qspGetAbsFromRelPath(s);
+	QSP_CHAR *file = qspGetPathAsIs(s);
 	qspCallOpenQuest(file, QSP_TRUE);
 	free(file);
 	if (qspErrorNum) return;
@@ -143,7 +134,7 @@ INLINE void qspOpenIncludes()
 {
 	for (int i = 0; i < qspCurIncFilesCount; ++i)
 	{
-		QSP_CHAR *file = qspGetAbsFromRelPath(qspCurIncFiles[i]);
+		QSP_CHAR *file = qspGetPathAsIs(qspCurIncFiles[i]);
 		qspCallOpenQuest(file, QSP_TRUE);
 		free(file);
 		if (qspErrorNum) return;
@@ -234,11 +225,11 @@ INLINE QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
 	return QSP_TRUE;
 }
 
-void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL isAddLocs)
+void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isAddLocs)
 {
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
 	int i, j, ind, crc, count, locsCount, actsCount, start, end;
-	QSP_CHAR *buf, *delim;
+	QSP_CHAR *buf;
 	char **strs;
 	if (dataSize < 2)
 	{
@@ -321,19 +312,13 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 	count = locsCount - start;
 	if (count) qspPrepareLocs();
 	if (isAddLocs)
+	{
 		qspCurIncLocsCount += count;
+	}
 	else
 	{
-		qspQstFullPath = qspGetAddText(qspQstFullPath, fileName, 0, -1);
-		delim = qspInStrRChars(qspQstFullPath, QSP_PATHDELIMS, 0);
-		qspQstPathLen = (delim ? (int)(delim - qspQstFullPath) + 1 : 0);
-		qspQstPath = qspGetAddText(qspQstPath, qspQstFullPath, 0, qspQstPathLen);
 		qspQstCRC = crc;
 		qspCurLoc = -1;
-
-		#ifdef __ANDROID__
-			qspCallChangeQuestPath(qspQstPath);
-		#endif
 	}
 }
 
@@ -371,7 +356,7 @@ int qspSaveGameStatusToString(QSP_CHAR **buf)
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
 		if (qspCurActions[i].Image)
-			len = qspCodeWriteVal(buf, &bufSize, len, qspCurActions[i].Image + qspQstPathLen, QSP_TRUE);
+			len = qspCodeWriteVal(buf, &bufSize, len, qspCurActions[i].Image, QSP_TRUE);
 		else
 			len = qspCodeWriteVal(buf, &bufSize, len, 0, QSP_FALSE);
 		len = qspCodeWriteVal(buf, &bufSize, len, qspCurActions[i].Desc, QSP_TRUE);
@@ -390,7 +375,7 @@ int qspSaveGameStatusToString(QSP_CHAR **buf)
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
 		if (qspCurObjects[i].Image)
-			len = qspCodeWriteVal(buf, &bufSize, len, qspCurObjects[i].Image + qspQstPathLen, QSP_TRUE);
+			len = qspCodeWriteVal(buf, &bufSize, len, qspCurObjects[i].Image, QSP_TRUE);
 		else
 			len = qspCodeWriteVal(buf, &bufSize, len, 0, QSP_FALSE);
 		len = qspCodeWriteVal(buf, &bufSize, len, qspCurObjects[i].Desc, QSP_TRUE);
@@ -619,7 +604,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, int
 	case 0:
 		if (qspIsAnyString(QSP_STR(args[0])))
 		{
-			QSP_CHAR *file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+			QSP_CHAR *file = qspGetPathAsIs(QSP_STR(args[0]));
 			qspCallOpenQuest(file, QSP_FALSE);
 			free(file);
 			if (qspErrorNum) return QSP_FALSE;
@@ -638,7 +623,7 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 	QSP_CHAR *file;
 	if (count && qspIsAnyString(QSP_STR(args[0])))
 	{
-		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+		file = qspGetPathAsIs(QSP_STR(args[0]));
 		qspCallOpenGame(file);
 		free(file);
 	}
@@ -652,7 +637,7 @@ QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 	QSP_CHAR *file;
 	if (count && qspIsAnyString(QSP_STR(args[0])))
 	{
-		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+		file = qspGetPathAsIs(QSP_STR(args[0]));
 		qspCallSaveGame(file);
 		free(file);
 	}
