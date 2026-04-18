@@ -15,21 +15,17 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include <uchar.h>
+
 #ifndef QSP_DEFAULTDEFINES
 	#define QSP_DEFAULTDEFINES
 
 	static int qspEndiannessTestValue = 1;
 
 	#ifdef _UNICODE
-		#ifdef _WIN32
-			typedef wchar_t QSP_CHAR;
-			#define QSP_FMT2(x) L##x
-			#define QSP_FMT(x) QSP_FMT2(x)
-		#else
-			typedef unsigned short QSP_CHAR;
-			#define QSP_FMT2(x) u##x
-			#define QSP_FMT(x) QSP_FMT2(x)
-		#endif
+		typedef char16_t QSP_CHAR;
+		#define QSP_FMT2(x) u##x
+		#define QSP_FMT(x) QSP_FMT2(x)
 
 		#define QSP_ONIG_ENC ((*(unsigned char *)&(qspEndiannessTestValue) == 1) ? \
                              (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
@@ -38,8 +34,6 @@
 		#define QSP_STRCOLL qspStrsComp
 		#define QSP_CHRLWR qspToWLower
 		#define QSP_CHRUPR qspToWUpper
-		#define QSP_WCSTOMBSLEN(a) (int)wcstombs(0, a, 0)
-		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
 
 		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
@@ -47,11 +41,6 @@
 		#define QSP_WCTOB
 		#define QSP_BTOWC
 
-		#ifdef _MSC_VER
-			#define QSP_FOPEN _wfopen
-		#else
-			#define QSP_FOPEN qspFileOpen
-		#endif
 	#else
 		typedef unsigned char QSP_CHAR;
 		#define QSP_FMT(x) x

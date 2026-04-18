@@ -293,10 +293,33 @@ QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
 
 char *qspFromQSPString(QSP_CHAR *s)
 {
-	int len = QSP_WCSTOMBSLEN(s) + 1;
-	char *ret = (char *)malloc(len);
-	QSP_WCSTOMBS(ret, s, len);
-	return ret;
+	if (!s) return NULL;
+
+	size_t s_len = 0;
+	while (s[s_len] != u'\0') {
+		s_len++;
+	}
+
+	size_t max_bytes = (s_len + 1) * MB_CUR_MAX;
+	char *ret = (char *)malloc(max_bytes);
+	if (!ret) return NULL;
+
+	mbstate_t state = {0};
+	char *out_ptr = ret;
+
+	for (size_t i = 0; i <= s_len; i++) {
+		size_t res = c16rtomb(out_ptr, s[i], &state);
+		if (res == (size_t)-1) {
+			free(ret);
+			return NULL;
+		}
+		out_ptr += res;
+	}
+
+	size_t actual_bytes = out_ptr - ret;
+	char *shrunk_ret = (char *)realloc(ret, actual_bytes);
+
+	return shrunk_ret ? shrunk_ret : ret;
 }
 
 INLINE char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)

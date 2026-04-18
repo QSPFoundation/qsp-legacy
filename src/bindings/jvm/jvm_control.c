@@ -576,7 +576,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromPath(
 	QSP_CHAR* path = ndkFromJavaString(env, filePath);
 	QSP_CHAR* name = ndkFromJavaString(env, fileName);
 
-	FILE *f = QSP_FOPEN(path, QSP_FMT("rb"));
+	FILE *f = qspFileOpen(path, QSP_FMT("rb"));
 	if (f == NULL)
 	{
 		free(path);
@@ -608,7 +608,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_saveGameByPath(JNIEnv 
 
 	QSP_CHAR* path = ndkFromJavaString(env, filePath);
 
-	FILE *f = QSP_FOPEN(path, QSP_FMT("wb"));
+	FILE *f = qspFileOpen(path, QSP_FMT("wb"));
 	if (f == NULL)
 	{
 		free(path);
@@ -639,7 +639,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_openSavedGameFromPath(
 
 	QSP_CHAR* path = ndkFromJavaString(env, filePath);
 
-	FILE *f = QSP_FOPEN(path, QSP_FMT("rb"));
+	FILE *f = qspFileOpen(path, QSP_FMT("rb"));
 	if (f == NULL)
 	{
 		free(path);

@@ -179,14 +179,27 @@ void qspNewGame(QSP_BOOL isReset)
 
 FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 {
-	FILE *ret;
-	char *mode;
+	if (!fileName || !fileMode) return NULL;
+
+#ifdef _WIN32
+	return _wfopen((const wchar_t *)fileName, (const wchar_t *)fileMode);
+#else
 	char *file = qspFromQSPString(fileName);
-	mode = qspFromQSPString(fileMode);
-	ret = fopen(file, mode);
+	if (!file) return NULL;
+
+	char *mode = qspFromQSPString(fileMode);
+	if (!mode) {
+		free(file);
+		return NULL;
+	}
+
+	FILE *ret = fopen(file, mode);
+
 	free(file);
 	free(mode);
+
 	return ret;
+#endif
 }
 
 INLINE QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
