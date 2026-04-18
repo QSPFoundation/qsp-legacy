@@ -101,4 +101,6 @@ public abstract class QSPLegacyLib {
     public void onSleep(int msecs) {}
 
     public int onShowMenu(ListItem[] items) { return -1; }
+
+    public void onChangeQuestPath(String path) {}
 }

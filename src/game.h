@@ -29,15 +29,19 @@
 	#define QSP_MAXINCFILES 100
 	#define QSP_DEFTIMERINTERVAL 500
 
+	extern QSP_CHAR *qspQstPath;
+	extern int qspQstPathLen;
+	extern QSP_CHAR *qspQstFullPath;
 	extern int qspQstCRC;
 	extern int qspCurIncLocsCount;
 
 	/* External functions */
 	FILE *qspFileOpen(QSP_CHAR *, QSP_CHAR *);
+	QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
     QSP_CHAR *qspGetPathAsIs(QSP_CHAR *path);
 	void qspClearIncludes(QSP_BOOL);
 	void qspNewGame(QSP_BOOL);
-	void qspOpenQuestFromData(char *, int, QSP_BOOL);
+	void qspOpenQuestFromData(char *, int, QSP_CHAR *, QSP_BOOL);
 	int qspSaveGameStatusToString(QSP_CHAR **);
 	void qspOpenGameStatusFromString(QSP_CHAR *);
 	/* Statements */

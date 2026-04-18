@@ -59,5 +59,6 @@
 	int qspCallGetMSCount();
 	void qspCallCloseFile(QSP_CHAR *);
 	QSP_CHAR *qspCallInputBox(QSP_CHAR *);
+	void qspCallChangeQuestPath(QSP_CHAR *);
 
 #endif

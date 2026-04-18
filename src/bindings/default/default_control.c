@@ -31,11 +31,11 @@
 #include "../../text.h"
 #include "../../variables.h"
 
-INLINE void qspOpenQuestFromFILE(FILE *, QSP_BOOL);
+INLINE void qspOpenQuestFromFILE(FILE *, const QSP_CHAR *, QSP_BOOL);
 INLINE void qspSaveGameStatusToFILE(FILE *);
 INLINE void qspOpenGameStatusFromFILE(FILE *);
 
-void qspOpenQuestFromFILE(FILE *f, const QSP_BOOL isAddLocs)
+void qspOpenQuestFromFILE(FILE *f, const QSP_CHAR *fileName, const QSP_BOOL isAddLocs)
 {
 	fseek(f, 0, SEEK_END);
 	const int fileSize = ftell(f);
@@ -48,7 +48,7 @@ void qspOpenQuestFromFILE(FILE *f, const QSP_BOOL isAddLocs)
 
 		buf[fileSize] = buf[fileSize + 1] = buf[fileSize + 2] = 0;
 
-		qspOpenQuestFromData(buf, fileSize + 3, isAddLocs);
+		qspOpenQuestFromData(buf, fileSize + 3, fileName, isAddLocs);
 		free(buf);
 	} else {
 		qspSetError(QSP_ERR_FILENOTFOUND);
@@ -123,6 +123,12 @@ const QSP_CHAR *QSPGetCompiledDateTime()
 int QSPGetFullRefreshCount()
 {
 	return qspFullRefreshCount;
+}
+/* ------------------------------------------------------------ */
+/* Full path to the downloaded game file */
+const QSP_CHAR *QSPGetQstFullPath()
+{
+	return qspQstFullPath;
 }
 /* ------------------------------------------------------------ */
 /* Current location */
@@ -419,23 +425,23 @@ QSP_CHAR *QSPGetErrorDesc(int errorNum)
 /* Game controls */
 
 /* Load new game from file */
-QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fullPath, QSP_BOOL isAddLocs)
+QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 {
-	if (fullPath == NULL) return QSP_FALSE;
+	if (fileName == NULL) return QSP_FALSE;
 
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
 
 	if (qspIsDisableCodeExec) return QSP_FALSE;
 
-	FILE *f = qspFileOpen(fullPath, QSP_FMT("rb"));
+	FILE *f = qspFileOpen(fileName, QSP_FMT("rb"));
 	if (f == NULL)
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
 		return QSP_FALSE;
 	}
 
-	qspOpenQuestFromFILE(f, isAddLocs);
+	qspOpenQuestFromFILE(f, fileName, isAddLocs);
 
 	fclose(f);
 
@@ -444,12 +450,12 @@ QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fullPath, QSP_BOOL isAddLocs)
 	return QSP_TRUE;
 }
 /* Load game from memory */
-QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, QSP_BOOL isAddLocs)
+QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 {
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	qspOpenQuestFromData((char *)data, dataSize, isAddLocs);
+	qspOpenQuestFromData((char *)data, dataSize, (QSP_CHAR *)fileName, isAddLocs);
 	if (qspErrorNum) return QSP_FALSE;
 	return QSP_TRUE;
 }

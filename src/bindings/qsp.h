@@ -79,6 +79,9 @@
 		QSP_CALL_SLEEP, /* void func(int msecs) */
 		QSP_CALL_GETMSCOUNT, /* int func() */
 		QSP_CALL_INPUTBOX, /* void func(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen) */
+		#ifdef _JVM_BINDING
+		QSP_CALL_CHANGEQUESTPATH,
+		#endif
 		QSP_CALL_DUMMY
 	};
 

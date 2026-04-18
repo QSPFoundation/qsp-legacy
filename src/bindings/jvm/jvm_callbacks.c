@@ -356,4 +356,18 @@ QSP_CHAR* qspCallInputBox(QSP_CHAR* text)
 	return qspGetNewText(QSP_FMT(""), 0);
 }
 
+void qspCallChangeQuestPath(QSP_CHAR* path)
+{
+	if (qspCallBacks[QSP_CALL_CHANGEQUESTPATH]) {
+		QSPCallState state;
+		JNIEnv *javaEnv = ndkGetJniEnv();
+		jstring qspText = ndkToJavaString(javaEnv, path);
+
+		qspSaveCallState(&state, QSP_FALSE, QSP_FALSE);
+		(*javaEnv)->CallVoidMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_CHANGEQUESTPATH], qspText);
+		(*javaEnv)->DeleteLocalRef(javaEnv, qspText);
+		qspRestoreCallState(&state);
+	}
+}
+
 #endif

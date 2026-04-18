@@ -143,7 +143,7 @@ QSP_CHAR *qspGetAllActionsAsCode()
 		if (qspCurActions[i].Image)
 		{
 			len = qspAddText(&res, QSP_FMT("','"), len, 3, QSP_FALSE);
-			temp = qspReplaceText(qspCurActions[i].Image, QSP_FMT("'"), QSP_FMT("''"));
+			temp = qspReplaceText(qspCurActions[i].Image + qspQstPathLen, QSP_FMT("'"), QSP_FMT("''"));
 			len = qspAddText(&res, temp, len, -1, QSP_FALSE);
 			free(temp);
 		}
