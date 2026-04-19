@@ -38,4 +38,7 @@
 	int qspCodeWriteIntVal(QSP_CHAR **, int *, int, int, QSP_BOOL);
 	int qspCodeWriteVal(QSP_CHAR **, int *, int, QSP_CHAR *, QSP_BOOL);
 
+	char *qspW2C(QSP_CHAR *src);
+	QSP_CHAR *qspC2W(char *src);
+
 #endif
