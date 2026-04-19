@@ -178,10 +178,10 @@ FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 #ifdef _WIN32
 	return _wfopen((const wchar_t *)fileName, (const wchar_t *)fileMode);
 #else
-	char *file = qspFromQSPString(fileName);
+	char *file = qspW2C(fileName);
 	if (!file) return NULL;
 
-	char *mode = qspFromQSPString(fileMode);
+	char *mode = qspW2C(fileMode);
 	if (!mode) {
 		free(file);
 		return NULL;

@@ -25,7 +25,6 @@
 #include <time.h>
 #include <limits.h>
 #include <string.h>
-#include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
 

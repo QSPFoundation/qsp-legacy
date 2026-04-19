@@ -15,7 +15,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include <uchar.h>
+#include <stdint.h>
 
 #ifndef QSP_DEFAULTDEFINES
 	#define QSP_DEFAULTDEFINES
@@ -23,7 +23,7 @@
 	static int qspEndiannessTestValue = 1;
 
 	#ifdef _UNICODE
-		typedef char16_t QSP_CHAR;
+		typedef uint16_t QSP_CHAR;
 		#define QSP_FMT2(x) u##x
 		#define QSP_FMT(x) QSP_FMT2(x)
 

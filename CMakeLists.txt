@@ -81,6 +81,7 @@ configure_file(qsp_legacy_config.h.cmakein qsp_legacy_config.h @ONLY)
 set(QSP_LEGACY_SOURCES
 		src/bindings/bindings_config.h
 		src/bindings/default/default_callbacks.c
+		src/bindings/default/default_coding.c
 		src/bindings/default/default_control.c
 		src/bindings/default/qsp_default.h
 		src/bindings/jvm/jvm_callbacks.c
