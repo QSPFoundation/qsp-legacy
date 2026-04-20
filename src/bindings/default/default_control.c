@@ -518,7 +518,7 @@ QSP_BOOL QSPOpenSavedGameFromFile(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 
 	if (qspIsDisableCodeExec) return QSP_FALSE;
 
-	FILE *f = qspFileOpen(fileName, QSP_FMT("wb"));
+	FILE *f = qspFileOpen(fileName, QSP_FMT("rb"));
 	if (f == NULL)
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
