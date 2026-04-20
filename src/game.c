@@ -175,9 +175,6 @@ FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 {
 	if (!fileName || !fileMode) return NULL;
 
-#ifdef _WIN32
-	return _wfopen((const wchar_t *)fileName, (const wchar_t *)fileMode);
-#else
 	char *file = qspW2C(fileName);
 	if (!file) return NULL;
 
@@ -193,7 +190,6 @@ FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 	free(mode);
 
 	return ret;
-#endif
 }
 
 INLINE QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
