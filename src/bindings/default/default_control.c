@@ -35,7 +35,7 @@ INLINE void qspOpenQuestFromFILE(FILE *, const QSP_CHAR *, QSP_BOOL);
 INLINE void qspSaveGameStatusToFILE(FILE *);
 INLINE void qspOpenGameStatusFromFILE(FILE *);
 
-void qspOpenQuestFromFILE(FILE *f, const QSP_CHAR *fileName, const QSP_BOOL isAddLocs)
+INLINE void qspOpenQuestFromFILE(FILE *f, const QSP_CHAR *fileName, const QSP_BOOL isAddLocs)
 {
 	fseek(f, 0, SEEK_END);
 	const int fileSize = ftell(f);
@@ -55,7 +55,7 @@ void qspOpenQuestFromFILE(FILE *f, const QSP_CHAR *fileName, const QSP_BOOL isAd
 	}
 }
 
-void qspOpenGameStatusFromFILE(FILE *f)
+INLINE void qspOpenGameStatusFromFILE(FILE *f)
 {
 	int fileLen;
 	QSP_CHAR *buf;
@@ -72,7 +72,7 @@ void qspOpenGameStatusFromFILE(FILE *f)
 	free(buf);
 }
 
-void qspSaveGameStatusToFILE(FILE *f)
+INLINE void qspSaveGameStatusToFILE(FILE *f)
 {
 	int len;
 	QSP_CHAR *buf;

@@ -30,9 +30,6 @@
 #include "time.h"
 #include "variables.h"
 
-QSP_CHAR *qspQstPath = 0;
-int qspQstPathLen = 0;
-QSP_CHAR *qspQstFullPath = 0;
 int qspQstCRC = 0;
 
 QSP_CHAR *qspCurIncFiles[QSP_MAXINCFILES];
@@ -228,7 +225,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 {
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
 	int i, j, ind, crc, count, locsCount, actsCount, start, end;
-	QSP_CHAR *buf, *delim;
+	QSP_CHAR *buf;
 	char **strs;
 	if (dataSize < 2)
 	{
@@ -314,16 +311,8 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 		qspCurIncLocsCount += count;
 	else
 	{
-		qspQstFullPath = qspGetAddText(qspQstFullPath, fileName, 0, -1);
-		delim = qspInStrRChars(qspQstFullPath, QSP_PATHDELIMS, 0);
-		qspQstPathLen = (delim ? (int)(delim - qspQstFullPath) + 1 : 0);
-		qspQstPath = qspGetAddText(qspQstPath, qspQstFullPath, 0, qspQstPathLen);
 		qspQstCRC = crc;
 		qspCurLoc = -1;
-
-		#ifdef __ANDROID__
-			qspCallChangeQuestPath(qspQstPath);
-		#endif
 	}
 }
 
@@ -361,7 +350,7 @@ int qspSaveGameStatusToString(QSP_CHAR **buf)
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
 		if (qspCurActions[i].Image)
-			len = qspCodeWriteVal(buf, &bufSize, len, qspCurActions[i].Image + qspQstPathLen, QSP_TRUE);
+			len = qspCodeWriteVal(buf, &bufSize, len, qspCurActions[i].Image, QSP_TRUE);
 		else
 			len = qspCodeWriteVal(buf, &bufSize, len, 0, QSP_FALSE);
 		len = qspCodeWriteVal(buf, &bufSize, len, qspCurActions[i].Desc, QSP_TRUE);
@@ -380,7 +369,7 @@ int qspSaveGameStatusToString(QSP_CHAR **buf)
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
 		if (qspCurObjects[i].Image)
-			len = qspCodeWriteVal(buf, &bufSize, len, qspCurObjects[i].Image + qspQstPathLen, QSP_TRUE);
+			len = qspCodeWriteVal(buf, &bufSize, len, qspCurObjects[i].Image, QSP_TRUE);
 		else
 			len = qspCodeWriteVal(buf, &bufSize, len, 0, QSP_FALSE);
 		len = qspCodeWriteVal(buf, &bufSize, len, qspCurObjects[i].Desc, QSP_TRUE);

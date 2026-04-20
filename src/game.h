@@ -29,9 +29,6 @@
 	#define QSP_MAXINCFILES 100
 	#define QSP_DEFTIMERINTERVAL 500
 
-	extern QSP_CHAR *qspQstPath;
-	extern int qspQstPathLen;
-	extern QSP_CHAR *qspQstFullPath;
 	extern int qspQstCRC;
 	extern int qspCurIncLocsCount;
 

@@ -51,8 +51,6 @@ void qspInitRuntime(void)
 {
 	qspIsDebug = QSP_FALSE;
 	qspRefreshCount = qspFullRefreshCount = 0;
-	qspQstPath = qspQstFullPath = 0;
-	qspQstPathLen = 0;
 	qspQstCRC = 0;
 	qspRealCurLoc = -1;
 	qspRealActIndex = -1;
@@ -77,8 +75,6 @@ void qspTerminateRuntime(void)
 {
 	qspMemClear(QSP_FALSE);
 	qspCreateWorld(0, 0);
-	if (qspQstPath) free(qspQstPath);
-	if (qspQstFullPath) free(qspQstFullPath);
 }
 
 void qspPrepareExecution()

@@ -53,12 +53,6 @@
 		#define INLINE static
 	#endif
 
-	#if defined(_WIN) || defined(_PSP)
-		#define QSP_PATHDELIMS QSP_FMT("/\\")
-	#else
-		#define QSP_PATHDELIMS QSP_FMT("/")
-	#endif
-
 	#define QSP_VER QSP_FMT(QSP_LEGACY_VER_STR)
 	#define QSP_LOCALE "C"
 	#define QSP_STRCHAR QSP_FMT("$")
