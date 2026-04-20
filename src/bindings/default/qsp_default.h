@@ -133,7 +133,7 @@
 	QSP_LEGACY_EXTERN QSP_CHAR *QSPGetErrorDesc(int errorNum);
 	/* Game */
 	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *file, QSP_BOOL isAddLocs);
-	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *file, QSP_BOOL isAddLocs);
+	QSP_LEGACY_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, QSP_BOOL isAddLocs);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPSaveGameAsFile(const QSP_CHAR *file, QSP_BOOL isRefresh);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPSaveGameAsData(QSP_CHAR *strBuf, int strBufSize, int *realSize, QSP_BOOL isRefresh);
 	QSP_LEGACY_EXTERN QSP_BOOL QSPOpenSavedGameFromFile(const QSP_CHAR *file, QSP_BOOL isRefresh);

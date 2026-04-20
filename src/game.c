@@ -221,7 +221,7 @@ INLINE QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
 	return QSP_TRUE;
 }
 
-void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL isAddLocs)
+void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isAddLocs)
 {
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
 	int i, j, ind, crc, count, locsCount, actsCount, start, end;
