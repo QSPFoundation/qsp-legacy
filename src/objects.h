@@ -39,7 +39,6 @@
 	void qspClearObjects(QSP_BOOL);
 	void qspClearObjectsWithNotify();
 	int qspObjIndex(QSP_CHAR *);
-	QSP_BOOL qspGetObjectInfoByIndex(int index, QSPListItem *info);
 	/* Statements */
 	QSP_BOOL qspStatementAddObject(QSPVariant *, int, QSP_CHAR **, int);
 	QSP_BOOL qspStatementDelObj(QSPVariant *, int, QSP_CHAR **, int);

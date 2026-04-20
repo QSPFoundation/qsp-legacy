@@ -246,7 +246,10 @@ int QSPGetObjects(QSPListItem *items, int itemsBufSize)
 {
 	int i;
 	for (i = 0; i < qspCurObjectsCount && i < itemsBufSize; ++i)
-		qspGetObjectInfoByIndex(i, items + i);
+	{
+		items[i].Name = qspCurObjects[i].Desc;
+		items[i].Image = qspCurObjects[i].Image;
+	}
 	return qspCurObjectsCount;
 }
 /* Set the index of the selected object */
