@@ -756,20 +756,20 @@ JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_init(JNIEnv *env, 
 	/* Get JVM references */
 	(*env)->GetJavaVM(env, &ndkJvm);
 
-	jclass clazz = (*env)->FindClass(env, "com/libsdhqs/jni/QSLibSDH");
+	jclass clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib");
 	ndkApiClass = (*env)->NewGlobalRef(env, clazz);
 	ndkApiObject = (*env)->NewGlobalRef(env, this);
 
-	clazz = (*env)->FindClass(env, "com/libsdhqs/jni/QSLibSDH$ListItem");
+	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ListItem");
 	ndkListItemClass = (*env)->NewGlobalRef(env, clazz);
 
-	clazz = (*env)->FindClass(env, "com/libsdhqs/jni/QSLibSDH$ExecutionState");
+	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ExecutionState");
 	ndkExecutionStateClass = (*env)->NewGlobalRef(env, clazz);
 
-	clazz = (*env)->FindClass(env, "com/libsdhqs/jni/QSLibSDH$ErrorData");
+	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ErrorData");
 	ndkErrorInfoClass = (*env)->NewGlobalRef(env, clazz);
 
-	clazz = (*env)->FindClass(env, "com/libsdhqs/jni/QSLibSDH$VarValResp");
+	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$VarValResp");
 	ndkVarValResp = (*env)->NewGlobalRef(env, clazz);
 
 	/* Get references to callbacks */
