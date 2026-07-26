@@ -67,8 +67,8 @@ public abstract class QSPLegacyLib {
     public native boolean restartGame(boolean isRefresh);
 
     public native boolean loadGameWorldFromData(byte[] data, String fileName, boolean isAddLocs);
-    public native boolean loadGameWorldFromFD(int fileDescriptor, String fileName, boolean isAddLocs);
-    public native boolean loadGameWorldFromPath(String filePath, String fileName, boolean isAddLocs);
+    public native boolean loadGameWorldFromFD(int fileDescriptor, boolean isAddLocs);
+    public native boolean loadGameWorldFromPath(String filePath, boolean isAddLocs);
 
     public native byte[] saveGameAsData(boolean isRefresh);
     public native boolean saveGameByFD(int fileDescriptor, boolean isRefresh);

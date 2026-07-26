@@ -87,7 +87,7 @@
 	JNIListItem ndkToJavaListItem(JNIEnv *env, QSP_CHAR *name, QSP_CHAR *image);
 	void ndkReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem);
 
-	void qspOpenQuestFromFILE(FILE *, QSP_CHAR *, QSP_BOOL);
+	void qspOpenQuestFromFILE(FILE *, QSP_BOOL);
 	void qspSaveGameStatusToFILE(FILE *);
 	void qspOpenGameStatusFromFILE(FILE *);
 

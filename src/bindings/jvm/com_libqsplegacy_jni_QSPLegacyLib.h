@@ -301,7 +301,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldF
  * Signature: (ILjava/lang/String;Z)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldFromFD
-  (JNIEnv *, jobject, jint, jstring, jboolean);
+  (JNIEnv *, jobject, jint, jboolean);
 
 /*
  * Class:     com_libqsplegacy_jni_QSPLegacyLib
@@ -309,7 +309,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldF
  * Signature: (Ljava/lang/String;Ljava/lang/String;Z)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldFromPath
-  (JNIEnv *, jobject, jstring, jstring, jboolean);
+  (JNIEnv *, jobject, jstring, jboolean);
 
 /*
  * Class:     com_libqsplegacy_jni_QSPLegacyLib

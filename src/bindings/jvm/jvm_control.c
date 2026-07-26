@@ -80,13 +80,13 @@ void ndkReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem)
 /* Debugging */
 
 /* Managing the debugging mode */
-JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_enableDebugMode(JNIEnv *env, jobject this, jboolean isDebug)
+JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_enableDebugMode(JNIEnv *env, jobject this, jboolean isDebug)
 {
 	qspIsDebug = isDebug;
 }
 
 /* Getting current state data */
-JNIEXPORT jobject JNICALL Java_com_libsdhqs_jni_QSLibSDH_getCurStateData(JNIEnv *env, jobject this)
+JNIEXPORT jobject JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getCurStateData(JNIEnv *env, jobject this)
 {
 	jobject jniExecutionState = (*env)->AllocObject(env, ndkExecutionStateClass);
 
@@ -107,31 +107,25 @@ JNIEXPORT jobject JNICALL Java_com_libsdhqs_jni_QSLibSDH_getCurStateData(JNIEnv 
 /* Version Information */
 
 /* Version */
-JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getVersion(JNIEnv *env, jobject this)
+JNIEXPORT jstring JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getVersion(JNIEnv *env, jobject this)
 {
 	return ndkToJavaString(env, QSP_VER);
 }
 
 /* Date and time of compilation */
-JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getCompiledDateTime(JNIEnv *env, jobject this)
+JNIEXPORT jstring JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getCompiledDateTime(JNIEnv *env, jobject this)
 {
 	return ndkToJavaString(env, QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__));
 }
 /* ------------------------------------------------------------ */
 /* Number of full location updates */
-JNIEXPORT jint JNICALL Java_com_libsdhqs_jni_QSLibSDH_getFullRefreshCount(JNIEnv *env, jobject this)
+JNIEXPORT jint JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getFullRefreshCount(JNIEnv *env, jobject this)
 {
 	return qspFullRefreshCount;
 }
 /* ------------------------------------------------------------ */
-/* Full path to the downloaded game file */
-JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getQstFullPath(JNIEnv *env, jobject this)
-{
-	return ndkToJavaString(env, qspQstFullPath);
-}
-/* ------------------------------------------------------------ */
 /* Name of the current location */
-JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getCurLoc(JNIEnv *env, jobject this)
+JNIEXPORT jstring JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getCurLoc(JNIEnv *env, jobject this)
 {
 	return ndkToJavaString(env, qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : 0);
 }
@@ -139,13 +133,13 @@ JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getCurLoc(JNIEnv *env, 
 /* Basic description of the location */
 
 /* Text of the main location description window */
-JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getMainDesc(JNIEnv *env, jobject this)
+JNIEXPORT jstring JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getMainDesc(JNIEnv *env, jobject this)
 {
 	return ndkToJavaString(env, qspCurDesc);
 }
 
 /* The ability to change the text of the main description */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_isMainDescChanged(JNIEnv *env, jobject this)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_isMainDescChanged(JNIEnv *env, jobject this)
 {
 	return qspIsMainDescChanged;
 }
@@ -153,20 +147,20 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_isMainDescChanged(JNIE
 /* Additional description of the location */
 
 /* Text of the additional location description window */
-JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getVarsDesc(JNIEnv *env, jobject this)
+JNIEXPORT jstring JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getVarsDesc(JNIEnv *env, jobject this)
 {
 	return ndkToJavaString(env, qspCurVars);
 }
 
 /* Possibility to change the text of the additional description */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_isVarsDescChanged(JNIEnv *env, jobject this)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_isVarsDescChanged(JNIEnv *env, jobject this)
 {
 	return qspIsVarsDescChanged;
 }
 
 /* ------------------------------------------------------------ */
 /* Text of the input line */
-JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_setInputStrText(JNIEnv *env, jobject this, jstring val)
+JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_setInputStrText(JNIEnv *env, jobject this, jstring val)
 {
 	QSP_CHAR *strConverted = ndkFromJavaString(env, val);
 	qspCurInputLen = qspAddText(&qspCurInput, strConverted, 0, -1, QSP_FALSE);
@@ -176,13 +170,13 @@ JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_setInputStrText(JNIEnv *en
 /* List of actions */
 
 /* Number of actions */
-JNIEXPORT jint JNICALL Java_com_libsdhqs_jni_QSLibSDH_getActionsCount(JNIEnv *env, jobject this)
+JNIEXPORT jint JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getActionsCount(JNIEnv *env, jobject this)
 {
 	return qspCurActionsCount;
 }
 
 /* Data actions with the specified index */
-JNIEXPORT jobjectArray JNICALL Java_com_libsdhqs_jni_QSLibSDH_getActions(JNIEnv *env, jobject this)
+JNIEXPORT jobjectArray JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getActions(JNIEnv *env, jobject this)
 {
 	int i;
 	JNIListItem item;
@@ -202,7 +196,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_libsdhqs_jni_QSLibSDH_getActions(JNIEnv 
 }
 
 /* Executing the code of the selected action */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_executeSelActionCode(JNIEnv *env, jobject this, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_executeSelActionCode(JNIEnv *env, jobject this, jboolean isRefresh)
 {
 	if (qspCurSelAction >= 0)
 	{
@@ -217,7 +211,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_executeSelActionCode(J
 }
 
 /* Set the index of the selected action */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_setSelActionIndex(JNIEnv *env, jobject this, jint ind, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_setSelActionIndex(JNIEnv *env, jobject this, jint ind, jboolean isRefresh)
 {
 	if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
 	{
@@ -233,13 +227,13 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_setSelActionIndex(JNIE
 }
 
 /* Get the index of the selected action */
-JNIEXPORT jint JNICALL Java_com_libsdhqs_jni_QSLibSDH_getSelActionIndex(JNIEnv *env, jobject this)
+JNIEXPORT jint JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getSelActionIndex(JNIEnv *env, jobject this)
 {
 	return qspCurSelAction;
 }
 
 /* Ability to change the list of actions */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_isActionsChanged(JNIEnv *env, jobject this)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_isActionsChanged(JNIEnv *env, jobject this)
 {
 	return qspIsActionsChanged;
 }
@@ -247,13 +241,13 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_isActionsChanged(JNIEn
 /* List of objects */
 
 /* Number of objects */
-JNIEXPORT jint JNICALL Java_com_libsdhqs_jni_QSLibSDH_getObjectsCount(JNIEnv *env, jobject this)
+JNIEXPORT jint JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getObjectsCount(JNIEnv *env, jobject this)
 {
 	return qspCurObjectsCount;
 }
 
 /* Object data with the specified index */
-JNIEXPORT jobjectArray JNICALL Java_com_libsdhqs_jni_QSLibSDH_getObjects(JNIEnv *env, jobject this)
+JNIEXPORT jobjectArray JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getObjects(JNIEnv *env, jobject this)
 {
 	int i;
 	JNIListItem item;
@@ -273,7 +267,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_libsdhqs_jni_QSLibSDH_getObjects(JNIEnv 
 }
 
 /* Set the index of the selected object */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_setSelObjectIndex(JNIEnv *env, jobject this, jint ind, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_setSelObjectIndex(JNIEnv *env, jobject this, jint ind, jboolean isRefresh)
 {
 	if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
 	{
@@ -289,13 +283,13 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_setSelObjectIndex(JNIE
 }
 
 /* Get the index of the selected object */
-JNIEXPORT jint JNICALL Java_com_libsdhqs_jni_QSLibSDH_getSelObjectIndex(JNIEnv *env, jobject this)
+JNIEXPORT jint JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getSelObjectIndex(JNIEnv *env, jobject this)
 {
 	return qspCurSelObject;
 }
 
 /* Ability to change the list of objects */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_isObjectsChanged(JNIEnv *env, jobject this)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_isObjectsChanged(JNIEnv *env, jobject this)
 {
 	return qspIsObjectsChanged;
 }
@@ -316,7 +310,7 @@ QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, int ind, int *numVal, QSP_CHAR **
 	return QSP_TRUE;
 }
 
-JNIEXPORT jobject JNICALL Java_com_libsdhqs_jni_QSLibSDH_getVarValues(JNIEnv *env, jobject this, jstring name, jint ind)
+JNIEXPORT jobject JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getVarValues(JNIEnv *env, jobject this, jstring name, jint ind)
 {
 	//Convert array name to QSP string
 	QSP_CHAR *strConverted = ndkFromJavaString(env, name);
@@ -354,7 +348,7 @@ JNIEXPORT jobject JNICALL Java_com_libsdhqs_jni_QSLibSDH_getVarValues(JNIEnv *en
 }
 
 /* Get the maximum number of variables */
-JNIEXPORT jint JNICALL Java_com_libsdhqs_jni_QSLibSDH_getMaxVarsCount(JNIEnv *env, jobject this)
+JNIEXPORT jint JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getMaxVarsCount(JNIEnv *env, jobject this)
 {
 	return QSP_VARSCOUNT;
 }
@@ -362,7 +356,7 @@ JNIEXPORT jint JNICALL Java_com_libsdhqs_jni_QSLibSDH_getMaxVarsCount(JNIEnv *en
 /* Code Execution */
 
 /* Executing a line of code */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execString(JNIEnv *env, jobject this, jstring s, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_execString(JNIEnv *env, jobject this, jstring s, jboolean isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspPrepareExecution();
@@ -384,7 +378,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execString(JNIEnv *env
 }
 
 /* Executing the code of the specified location */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execLocationCode(JNIEnv *env, jobject this, jstring name, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_execLocationCode(JNIEnv *env, jobject this, jstring name, jboolean isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspPrepareExecution();
@@ -406,7 +400,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execLocationCode(JNIEn
 }
 
 /* Execution of the location-counter code */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execCounter(JNIEnv *env, jobject this, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_execCounter(JNIEnv *env, jobject this, jboolean isRefresh)
 {
 	if (!qspIsInCallBack)
 	{
@@ -419,7 +413,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execCounter(JNIEnv *en
 }
 
 /* Execution of the code of the input line handler location */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execUserInput(JNIEnv *env, jobject this, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_execUserInput(JNIEnv *env, jobject this, jboolean isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum) return JNI_FALSE;
 	qspPrepareExecution();
@@ -433,7 +427,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_execUserInput(JNIEnv *
 /* Errors */
 
 /* Get information about the latest error */
-JNIEXPORT jobject JNICALL Java_com_libsdhqs_jni_QSLibSDH_getLastErrorData(JNIEnv *env, jobject this)
+JNIEXPORT jobject JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getLastErrorData(JNIEnv *env, jobject this)
 {
 	if (ndkErrorInfoClass == 0)
 		return NULL;
@@ -457,7 +451,7 @@ JNIEXPORT jobject JNICALL Java_com_libsdhqs_jni_QSLibSDH_getLastErrorData(JNIEnv
 }
 
 /* Get a description of the error by its number */
-JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getErrorDesc(JNIEnv *env, jobject this, jint errorNum)
+JNIEXPORT jstring JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getErrorDesc(JNIEnv *env, jobject this, jint errorNum)
 {
 	return ndkToJavaString(env, qspGetErrorDesc(errorNum));
 }
@@ -471,7 +465,7 @@ JNIEXPORT jstring JNICALL Java_com_libsdhqs_jni_QSLibSDH_getErrorDesc(JNIEnv *en
 /* Working with FileDescriptor */
 
 /* Loading a new game from FileDescriptor */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromFD(JNIEnv *env, jobject this, jint fileDescriptor, jstring fileName, jboolean isAddLocs)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldFromFD(JNIEnv *env, jobject this, jint fileDescriptor, jboolean isAddLocs)
 {
 	if (fileDescriptor < 0) return QSP_FALSE;
 
@@ -491,12 +485,9 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromFD(JN
 		return QSP_FALSE;
 	}
 
-	QSP_CHAR* name = ndkFromJavaString(env, fileName);
-
-	qspOpenQuestFromFILE(f, name, isAddLocs);
+	qspOpenQuestFromFILE(f, isAddLocs);
 
 	fclose(f);
-	free(name);
 
 	if (qspErrorNum) return QSP_FALSE;
 
@@ -504,7 +495,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromFD(JN
 }
 
 /* Saving state by FileDescriptor */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_saveGameByFD(JNIEnv *env, jobject this, jint fileDescriptor, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_saveGameByFD(JNIEnv *env, jobject this, jint fileDescriptor, jboolean isRefresh)
 {
 	if (fileDescriptor < 0) return QSP_FALSE;
 
@@ -532,7 +523,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_saveGameByFD(JNIEnv *e
 }
 
 /* Loading state from FileDescriptor */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_openSavedGameFromFD(JNIEnv *env, jobject this, jint fileDescriptor, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_openSavedGameFromFD(JNIEnv *env, jobject this, jint fileDescriptor, jboolean isRefresh)
 {
 	if (fileDescriptor < 0) return QSP_FALSE;
 
@@ -559,12 +550,10 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_openSavedGameFromFD(JN
 	return QSP_TRUE;
 }
 
-#else
-
 /* Working with file */
 
 /* Loading a new game from file */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromPath(JNIEnv *env, jobject this, jstring filePath, jstring fileName, jboolean isAddLocs)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldFromPath(JNIEnv *env, jobject this, jstring filePath, jboolean isAddLocs)
 {
 	if (filePath == NULL) return QSP_FALSE;
 
@@ -574,22 +563,19 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromPath(
 	if (qspIsDisableCodeExec) return QSP_FALSE;
 
 	QSP_CHAR* path = ndkFromJavaString(env, filePath);
-	QSP_CHAR* name = ndkFromJavaString(env, fileName);
 
 	FILE *f = qspFileOpen(path, QSP_FMT("rb"));
 	if (f == NULL)
 	{
 		free(path);
-		free(name);
 		qspSetError(QSP_ERR_FILENOTFOUND);
 		return QSP_FALSE;
 	}
 
-	qspOpenQuestFromFILE(f, name, isAddLocs);
+	qspOpenQuestFromFILE(f, isAddLocs);
 
 	fclose(f);
 	free(path);
-	free(name);
 
 	if (qspErrorNum) return QSP_FALSE;
 
@@ -597,7 +583,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromPath(
 }
 
 /* Saving state to file */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_saveGameByPath(JNIEnv *env, jobject this, jstring filePath, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_saveGameByPath(JNIEnv *env, jobject this, jstring filePath, jboolean isRefresh)
 {
 	if (filePath == NULL) return QSP_FALSE;
 
@@ -628,7 +614,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_saveGameByPath(JNIEnv 
 }
 
 /* Loading state from file */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_openSavedGameFromPath(JNIEnv *env, jobject this, jstring filePath, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_openSavedGameFromPath(JNIEnv *env, jobject this, jstring filePath, jboolean isRefresh)
 {
 	if (filePath == NULL) return QSP_FALSE;
 
@@ -663,7 +649,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_openSavedGameFromPath(
 /* Working with memory */
 
 /* Loading a new game from memory */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromData(JNIEnv *env, jobject this, jbyteArray data, jstring fileName, jboolean isAddLocs)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldFromData(JNIEnv *env, jobject this, jbyteArray data, jstring fileName, jboolean isAddLocs)
 {
 	if (data == NULL || fileName == NULL) return QSP_FALSE;
 
@@ -682,11 +668,8 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromData(
 
 	ptr[dataSize] = ptr[dataSize + 1] = ptr[dataSize + 2] = 0;
 
-	QSP_CHAR* name = ndkFromJavaString(env, fileName);
+	qspOpenQuestFromData(ptr, dataSize + 3, isAddLocs);
 
-	qspOpenQuestFromData(ptr, dataSize + 3, name, isAddLocs);
-
-	free(name);
 	free(ptr);
 
 	if (qspErrorNum) return QSP_FALSE;
@@ -695,7 +678,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_loadGameWorldFromData(
 }
 
 /* Saving state to memory */
-JNIEXPORT jbyteArray JNICALL Java_com_libsdhqs_jni_QSLibSDH_saveGameAsData(JNIEnv *env, jobject this, jboolean isRefresh)
+JNIEXPORT jbyteArray JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_saveGameAsData(JNIEnv *env, jobject this, jboolean isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum) return NULL;
 	qspPrepareExecution();
@@ -722,7 +705,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_libsdhqs_jni_QSLibSDH_saveGameAsData(JNIEn
 }
 
 /* Loading state from memory */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_openSavedGameFromData(JNIEnv *env, jobject this, jbyteArray data, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_openSavedGameFromData(JNIEnv *env, jobject this, jbyteArray data, jboolean isRefresh)
 {
 	if (data == NULL) return QSP_FALSE;
 
@@ -754,7 +737,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_openSavedGameFromData(
 }
 
 /* Restarting the game */
-JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_restartGame(JNIEnv *env, jobject this, jboolean isRefresh)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_restartGame(JNIEnv *env, jobject this, jboolean isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum) return JNI_FALSE;
 	qspPrepareExecution();
@@ -766,7 +749,7 @@ JNIEXPORT jboolean JNICALL Java_com_libsdhqs_jni_QSLibSDH_restartGame(JNIEnv *en
 }
 
 /* Initialization */
-JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_init(JNIEnv *env, jobject this)
+JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_init(JNIEnv *env, jobject this)
 {
 	qspInitRuntime();
 
@@ -806,11 +789,10 @@ JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_init(JNIEnv *env, jobject 
 	qspSetCallBack(QSP_CALL_SLEEP, (*env)->GetMethodID(env, ndkApiClass, "onSleep", "(I)V"));
 	qspSetCallBack(QSP_CALL_GETMSCOUNT, (*env)->GetMethodID(env, ndkApiClass, "onGetMsCount", "()I"));
 	qspSetCallBack(QSP_CALL_INPUTBOX, (*env)->GetMethodID(env, ndkApiClass, "onInputBox", "(Ljava/lang/String;)Ljava/lang/String;"));
-	qspSetCallBack(QSP_CALL_CHANGEQUESTPATH, (*env)->GetMethodID(env, ndkApiClass, "onChangeQuestPath", "(Ljava/lang/String;)V"));
 }
 
 /* Deinitialization */
-JNIEXPORT void JNICALL Java_com_libsdhqs_jni_QSLibSDH_terminate(JNIEnv *env, jobject this)
+JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_terminate(JNIEnv *env, jobject this)
 {
 	qspTerminateRuntime();
 

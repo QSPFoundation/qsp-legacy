@@ -5,7 +5,7 @@
 #include "../../errors.h"
 #include "../../game.h"
 
-void qspOpenQuestFromFILE(FILE *f, QSP_CHAR *fileName, const QSP_BOOL isAddLocs)
+void qspOpenQuestFromFILE(FILE *f, const QSP_BOOL isAddLocs)
 {
     fseek(f, 0, SEEK_END);
     const int fileSize = ftell(f);
@@ -18,7 +18,7 @@ void qspOpenQuestFromFILE(FILE *f, QSP_CHAR *fileName, const QSP_BOOL isAddLocs)
 
         buf[fileSize] = buf[fileSize + 1] = buf[fileSize + 2] = 0;
 
-        qspOpenQuestFromData(buf, fileSize + 3, fileName, isAddLocs);
+        qspOpenQuestFromData(buf, fileSize + 3, isAddLocs);
         free(buf);
     } else {
         qspSetError(QSP_ERR_FILENOTFOUND);
