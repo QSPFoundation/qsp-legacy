@@ -52,7 +52,7 @@ void initFieldIDs(JNIEnv *env) {
 	}
 }
 
-JNIListItem ndkToJavaListItem(JNIEnv *env, QSP_CHAR *image, QSP_CHAR *text)
+JNIListItem ndkToJavaListItem(JNIEnv *env, QSP_CHAR *name, QSP_CHAR *image)
 {
 	JNIListItem res;
 	initFieldIDs(env);
@@ -61,7 +61,7 @@ JNIListItem ndkToJavaListItem(JNIEnv *env, QSP_CHAR *image, QSP_CHAR *text)
 
 	res.ListItem = jniListItem;
 	res.Image = ndkToJavaString(env, image);
-	res.Name = ndkToJavaString(env, text);
+	res.Name = ndkToJavaString(env, name);
 
 	(*env)->SetObjectField(env, jniListItem, fieldImageID, res.Image);
 	(*env)->SetObjectField(env, jniListItem, fieldTextID, res.Name);
