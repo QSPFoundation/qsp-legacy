@@ -187,7 +187,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getActions
 
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
-		item = ndkToJavaListItem(env, qspCurActions[i].Image, qspCurActions[i].Desc);
+		item = ndkToJavaListItem(env, qspCurActions[i].Desc, qspCurActions[i].Image);
 		(*env)->SetObjectArrayElement(env, res, i, item.ListItem);
 		ndkReleaseJavaListItem(env, &item);
 	}
@@ -258,7 +258,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getObjects
 
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
-		item = ndkToJavaListItem(env, qspCurObjects[i].Image, qspCurObjects[i].Desc);
+		item = ndkToJavaListItem(env, qspCurObjects[i].Desc, qspCurObjects[i].Image);
 		(*env)->SetObjectArrayElement(env, res, i, item.ListItem);
 		ndkReleaseJavaListItem(env, &item);
 	}
