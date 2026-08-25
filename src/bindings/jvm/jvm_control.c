@@ -649,9 +649,9 @@ JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_openSavedGameF
 /* Working with memory */
 
 /* Loading a new game from memory */
-JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldFromData(JNIEnv *env, jobject this, jbyteArray data, jstring fileName, jboolean isAddLocs)
+JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_loadGameWorldFromData(JNIEnv *env, jobject this, jbyteArray data, jboolean isAddLocs)
 {
-	if (data == NULL || fileName == NULL) return QSP_FALSE;
+	if (data == NULL) return QSP_FALSE;
 
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
