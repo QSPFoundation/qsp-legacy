@@ -1,0 +1,526 @@
+QSPLegacy {
+    space := " " | "\t"
+
+    /* ====================
+       TOP-LEVEL STRUCTURE
+       ====================
+
+       Grammar of the QSP Legacy (5.7.x) language, derived from the grammar of
+       the modern engine (https://github.com/QSPFoundation/qsp/blob/master/help/qsp_grammar.peg)
+       and adjusted to match the parser implemented in this repository
+       (src/codetools.c, src/statements.c, src/mathops.c, src/variables.c, src/text.c).
+
+       1. The grammar is case-insensitive;
+       2. Operator precedence is defined in comments below;
+       3. Statements and functions don't define the exact number of arguments,
+          but functions are split into groups by the way they can be called
+          (no arguments / a single argument without parentheses / parentheses required);
+       4. You can use https://ohmjs.org/editor/ to test the grammar;
+
+       Main differences from the modern QSP grammar:
+        - there are no LOOP, LOCAL statements, no user calls (@name, @@name),
+          no tuples ([...] literals, (a, b) pseudo-tuples), no # and % type prefixes;
+        - a physical line break is never allowed inside parentheses or brackets
+          (only strings and {...} blocks may span multiple lines, plus " _" line continuation);
+        - an array index holds a single expression and must directly follow the variable name;
+        - & (concatenation) has the LOWEST priority, even lower than OR;
+        - LOC and OBJ have the same priority as NO;
+        - IF/ELSEIF/ELSE on a single line don't support ELSEIF (use "ELSE IF" which creates a nested IF);
+        - a comment right after the ":" of IF/ELSEIF/ACT turns the statement into a single-line one;
+        - a statement without a known name is an assignment if it contains "=" at the top level,
+          otherwise it's an implicit output (*PL) of the expression;
+        - {...} is a string literal (without <<subexpressions>>) usually used as a code block.
+    */
+
+    /*
+    start              = statementGroup* end
+    */
+
+    start              = interLocText (locationBlock interLocText)* end
+
+    /* ====================
+       TXT2GAM LOCATION BLOCKS
+       ====================
+    */
+
+    locationBlock      = startOfLoc (~endLocMarker statementGroup)* endOfLoc
+
+    startOfLoc         = startLocMarker space* locName space* newline
+    locName            = locNameChar+ (space+ locNameChar+)*
+    locNameChar        = ~(space | newline) any
+
+    endOfLoc           = endLocMarker endOfLocChar* (newline | &end)
+    endOfLocChar       = ~newline any
+
+    interLocText       = (interLocLine | newline)*
+    interLocLine       = ~startLocMarker interLocChar+ (newline | &end)
+    interLocChar       = ~newline any
+
+    startLocMarker     = "#"
+    endLocMarker       = "--"
+
+    /* ====================
+       STATEMENT BLOCKS
+       ====================
+    */
+
+    statementGroup       = ws (multiLineBlock | singleLineBlock | newline)
+
+    singleLineBlock      = singleLineGroup ws (newline | &end)
+    singleLineGroup      = singleLineStatements | statementSeparators
+    singleLineStatements = (statementSeparators ws)? statementUnitSingleLine (ws statementSeparators ws statementUnitSingleLine)* (ws statementSeparators)?
+    statementSeparators  = statementSeparator (ws statementSeparator)*
+
+    multiLineBlock       = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &end)
+
+    /* ====================
+       STATEMENT UNITS
+       ====================
+    */
+
+    statementUnitSingleLine = commentStatement
+                            | labelStatement
+                            | ifSingleLine
+                            | actSingleLine
+                            | assignmentStatement
+                            | statement
+                            | implicitStatement
+
+    statementUnitMultiLine  = ifMultiLine
+                            | actMultiLine
+
+    /* ====================
+       COMMENTS
+       ====================
+    */
+
+    /* Strings and {...} blocks are processed before splitting code into lines,
+       so they can span several lines even inside comments */
+    commentStatement        = "!" commentText
+    commentText             = (rawStringLiteral | rawCodeBlock | commentChar)*
+    commentChar             = ~(newline | "'" | "\"" | "{" | "}") any
+
+    /* ====================
+       ASSIGNMENTS
+       ====================
+    */
+
+    /* Only a single variable can be assigned; the operator chars must be written together */
+    assignmentStatement     = assignmentWithMarker | assignmentWithoutMarker
+    assignmentWithMarker    = setMarker &delimiterChar ws variableRef ws assignmentOperator ws nonAmpersandExpression
+    assignmentWithoutMarker = ~(statementName &delimiterChar) variableRef ws assignmentOperator ws nonAmpersandExpression
+
+    assignmentOperator      = "=" | "+=" | "-=" | "*=" | "/="
+
+    /* ====================
+       IF STATEMENTS
+       ====================
+    */
+
+    /* ELSE splits the line into statements, "ELSE IF" on a single line is a nested IF */
+    ifSingleLine            = ifMarker &delimiterChar ws expression ws ":" ws singleLineGroup (ws elseMarker &delimiterChar ws (":" ws)? singleLineGroup)?
+    ifMultiLine             = ifMarker &delimiterChar ws expression ws ":" ws newline
+                              statementGroup*
+                              elseifClause*
+                              elseClause?
+                              ws endIfMarker &delimiterChar (ws noteString)?
+
+    elseifClause            = ws (elseifMultiLine | elseifSingleLine)
+    elseifSingleLine        = elseIfMarker &delimiterChar ws expression ws ":" ws singleLineGroup ws newline
+    elseifMultiLine         = elseIfMarker &delimiterChar ws expression ws ":" ws newline
+                              statementGroup*
+
+    elseClause              = ws (elseMultiLine | elseSingleLine)
+    elseSingleLine          = elseMarker &delimiterChar ws (":" ws)? singleLineGroup ws newline
+    elseMultiLine           = elseMarker &delimiterChar ws (":" ws)? newline
+                              statementGroup*
+
+    /* ====================
+       ACT STATEMENTS
+       ====================
+    */
+
+    actSingleLine           = actMarker &delimiterChar ws actArguments ws ":" ws singleLineGroup
+    actMultiLine            = actMarker &delimiterChar ws actArguments ws ":" ws newline
+                              statementGroup*
+                              ws endActMarker &delimiterChar (ws noteString)?
+
+    actArguments            = actParenthesizedArguments | argumentList
+    actParenthesizedArguments = parenthesizedArgumentList &(ws ":")
+
+    /* ====================
+       REGULAR STATEMENTS
+       ====================
+    */
+
+    statement                  = statementEmptyArgs | statementWithArgs | statementNoArgs
+    statementNoArgs            = statementName &delimiterChar
+    statementEmptyArgs         = statementName &delimiterChar ws "(" ws ")" &argumentsEnd
+    statementWithArgs          = statementName &delimiterChar ws statementArguments
+
+    /* Arguments are treated as parenthesized only if nothing follows the closing parenthesis */
+    statementArguments         = statementParenthesizedArguments | nonAmpersandArgumentList
+    statementParenthesizedArguments = parenthesizedArgumentList &argumentsEnd
+
+    argumentsEnd               = ws (statementSeparator | newline | end | "}" | separatedElseMarker)
+    separatedElseMarker        = elseMarker &delimiterChar
+
+    /* ====================
+       FUNCTION CALLS
+       ====================
+    */
+
+    functionCall                = functionCallNoArgs
+                                | functionCallSingleArg
+                                | functionCallMultiArgs
+
+    /* Functions without arguments, e.g. RND, RND(), $CURLOC */
+    functionCallNoArgs          = noArgsFunctionName &delimiterChar (ws "(" ws ")")?
+
+    /* Functions with 1+ arguments, e.g. LEN($s), LEN $s, MAX(a, b, c)
+       Without parentheses the function takes the nearest operand (priority 30) */
+    functionCallSingleArg       = singleArgFunctionName &delimiterChar ws (parenthesizedArgumentList | unaryExpression)
+
+    /* Functions with 2+ arguments, parentheses are required, e.g. MID($s, 1, 2) */
+    functionCallMultiArgs       = multiArgsFunctionName &delimiterChar ws parenthesizedArgument2plusList
+
+    /* ====================
+       OTHER STATEMENTS
+       ====================
+    */
+
+    labelStatement                  = ":" labelName
+    labelName                       = labelChar*
+    labelChar                       = ~(statementSeparator | newline) any
+
+    /* Implicit output (*PL) of an expression: any top-level "=" turns the statement into an assignment,
+       so =, <=, >=, =<, => can't be used here without parentheses */
+    implicitStatement               = unaryExpression (ws implicitBinaryOperator ws unaryExpression)*
+
+    noteString                      = (rawStringLiteral | rawCodeBlock | noteChar)+
+    noteChar                        = ~(statementSeparator | newline | "'" | "\"" | "{" | "}" | "(" | ")" | "[" | "]") any
+
+    /* ====================
+       EXPRESSIONS
+       ====================
+    */
+
+    /* Expression for control headers (IF, ELSEIF, ACT) and parenthesized contexts - they can contain & */
+
+    expression                      = unaryExpression (ws extendedBinaryOperator ws unaryExpression)*
+
+    /* Expression for statement contexts is like expression but stops at & to avoid conflicts with statement separators */
+
+    nonAmpersandExpression          = unaryExpression (ws standardBinaryOperator ws unaryExpression)*
+
+    unaryExpression                 = (unaryOperator ws)* primaryExpression
+
+    /* Expression operators */
+
+    standardBinaryOperator          = separatedBinaryKeywordOperator | binaryStandardOperator
+    extendedBinaryOperator          = separatedBinaryKeywordOperator | binaryExtendedOperator
+    implicitBinaryOperator          = separatedBinaryKeywordOperator | binaryImplicitOperator
+    unaryOperator                   = separatedUnaryKeywordOperator | unaryStandardOperator
+
+    /* AND, OR, MOD must be followed by a space, a quote, "{" or "(" */
+    separatedBinaryKeywordOperator  = binaryKeywordOperator &(space | "'" | "\"" | "{" | "(")
+    separatedUnaryKeywordOperator   = unaryKeywordOperator &delimiterChar
+
+    /* ====================
+       PRIMARY EXPRESSIONS
+       ====================
+    */
+
+    primaryExpression               = parenthesizedExpression
+                                    | numberLiteral
+                                    | interpolatedString /* Try to parse it as a string with subexpressions */
+                                    | rawStringLiteral
+                                    | codeBlock
+                                    | functionCall
+                                    | variableRef
+
+    parenthesizedExpression         = "(" ws expression ws ")" /* Inside parentheses, & is always allowed */
+
+    argumentList                    = expression (ws "," ws expression)*
+    nonAmpersandArgumentList        = nonAmpersandExpression (ws "," ws nonAmpersandExpression)*
+    parenthesizedArgumentList       = "(" ws argumentList ws ")" /* Inside parentheses, & is always an operator */
+
+    argument2plusList               = expression ws "," ws expression (ws "," ws expression)*
+    parenthesizedArgument2plusList  = "(" ws argument2plusList ws ")"
+
+    /* ====================
+       VARIABLES
+       ====================
+    */
+
+    /* The index must directly follow the variable name (no spaces).
+       An empty index refers to the last element (or to a new element when assigning) */
+    variableRef         = varNameWithPrefix (emptyArrayIndex | arrayIndex)?
+    emptyArrayIndex     = "[" ws "]"
+    arrayIndex          = "[" ws expression ws "]"
+
+    /* ====================
+       LITERALS
+       ====================
+    */
+
+    rawStringLiteral             = rawSingleQuotedString | rawDoubleQuotedString
+
+    rawSingleQuotedString        = "'" (apostropheEscape | rawSingleQuotedChar)* "'"
+    rawDoubleQuotedString        = "\"" (quoteEscape | rawDoubleQuotedChar)* "\""
+
+    rawSingleQuotedChar          = ~("'") any
+    rawDoubleQuotedChar          = ~("\"") any
+
+    apostropheEscape             = "''"
+    quoteEscape                  = "\"\""
+
+    numberLiteral                = digit+
+
+    /* ====================
+       INTERPOLATED STRINGS
+       ====================
+
+       NOTE: this part of the grammar is INTENTIONALLY SIMPLIFIED to keep it readable.
+
+       How the engine really processes strings (src/mathops.c, src/text.c):
+        1. qspGetString reads the whole string literal first: from the opening quote
+           to the matching closing one, where a doubled quote stands for a quote char.
+           "<<" and ">>" have no special meaning at this step;
+        2. qspFormatText processes the unescaped text at runtime: it finds the first "<<",
+           then the first ">>" which isn't inside quotes or brackets,
+           and evaluates the text between them as an expression;
+        3. Subexpressions are not processed at all when DISABLESUBEX variable is not 0.
+
+       So a nested string with the same type of quotes as the parent string must use
+       doubled quotes, and the number of quotes doubles with every nesting level:
+           'a<<''b''>>c'                  - subexpression is 'b'
+           '<<''x<<''''y''''>>''>>'       - two nesting levels
+           '<<"it''s">>'                  - the inner "..." string contains '
+           'a<<'b'>>c'                    - ERROR: the string ends right after "a<<"
+
+       Known differences between this grammar and the engine:
+        - 'a<<'b'>>c' is accepted as a string with the 'b' subexpression,
+          although the engine treats it as the 'a<<' string followed by garbage;
+        - 'a<<''b''>>c' is accepted, but only as rawStringLiteral,
+          so its subexpression isn't parsed;
+        - strings with broken subexpressions ('<<1+>>', '<<b') are accepted
+          as rawStringLiteral, although the engine reports an error at runtime
+          (unless DISABLESUBEX is set, which can't be known statically).
+
+       A precise version is possible with parameterized rules that carry the current
+       representation of both quote chars, e.g.:
+           sqStr<sq, dq> = sq (sqSub<sq, dq> | twice<sq> | sqChar<sq, dq>)* sq
+           sqSub<sq, dq> = "<<" expression<twice<sq>, dq> ">>"
+           sqChar<sq, dq> = ~("'" | "<<") (dq | ~"\"" any)
+           twice<x>      = x x
+       but these parameters would have to be passed through every rule reachable
+       from a subexpression (about 20 rules, or most of the grammar if {...} blocks
+       inside subexpressions are parsed as code), and many PEG tools
+       don't support parameterized rules at all.
+    */
+
+    interpolatedString              = singleQuotedInterpolatedString | doubleQuotedInterpolatedString
+    singleQuotedInterpolatedString  = "'" (stringSubexpression | apostropheEscape | singleQuotedChar)* "'"
+    doubleQuotedInterpolatedString  = "\"" (stringSubexpression | quoteEscape | doubleQuotedChar)* "\""
+
+    /* The subexpression shouldn't contain strings with the same type of quotes as the parent string
+       (not enforced here, see the note above) */
+    stringSubexpression             = "<<" ws expression ws ">>" /* & is always allowed in subexpressions */
+
+    singleQuotedChar                = ~("'" | "<<") any
+    doubleQuotedChar                = ~("\"" | "<<") any
+
+    /* ====================
+       CODE BLOCKS
+       ====================
+
+       {...} is a string literal (subexpressions aren't evaluated inside), usually containing code
+    */
+
+    codeBlock                  = syntacticCodeBlock | rawCodeBlock /* Try to parse it as proper code */
+    syntacticCodeBlock         = "{" statementGroupInCodeBlock* "}"
+
+    statementGroupInCodeBlock  = ws (singleLineCodeBlock | multiLineCodeBlock | newline)
+
+    singleLineCodeBlock        = singleLineGroup ws (newline | &("}"))
+    multiLineCodeBlock         = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &("}"))
+
+    rawCodeBlock               = "{" (rawStringLiteral | rawCodeBlock | rawCodeBlockChar)* "}"
+    rawCodeBlockChar           = ~("{" | "}" | "'" | "\"") any
+
+    /* ====================
+       IDENTIFIERS
+       ====================
+    */
+
+    /* Only functions returning strings can be used with the $ prefix,
+       so $LEN is a regular string variable */
+    noArgsFunctionName    = noArgsStrFunction | noArgsNumFunctionName
+    singleArgFunctionName = singleArgStrFunction | singleArgNumFunctionName
+    multiArgsFunctionName = multiArgsStrFunction | multiArgsNumFunctionName
+
+    noArgsStrFunction     = typePrefix? noArgsStrFunctionName
+    singleArgStrFunction  = typePrefix? singleArgStrFunctionName
+    multiArgsStrFunction  = typePrefix? multiArgsStrFunctionName
+
+    strFunctionName       = noArgsStrFunctionName | singleArgStrFunctionName | multiArgsStrFunctionName
+    functionName          = noArgsFunctionName | singleArgFunctionName | multiArgsFunctionName
+
+    varNameWithPrefix     = strVarName | numVarName
+    strVarName            = typePrefix ~(strFunctionName delimiterChar) varNameChars
+    numVarName            = ~typePrefix ~(keyword delimiterChar) varNameChars
+    varNameChars          = ~digit nonDelimiterChar+
+
+    /* Statement names are reserved only at the beginning of a statement,
+       so they're not included here */
+    keyword               = functionName
+                          | standardMarker
+                          | binaryKeywordOperator
+                          | unaryKeywordOperator
+
+    delimiterChar       = end | newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | ":" | "," | "{" | "}"
+    nonDelimiterChar    = ~delimiterChar any
+
+    typePrefix          = "$"
+    newline             = "\n" | "\r\n"
+    lineContinuation    = space "_" newline
+    statementSeparator  = "&"
+    ws                  = (lineContinuation | space)*
+
+    /* ====================
+       KEYWORDS
+       ====================
+    */
+
+    setMarker           = "set" | "let"
+
+    actMarker           = "act"
+    endActMarker        = "end"
+
+    ifMarker            = "if"
+    elseIfMarker        = elseIfNoSpaceMarker | elseIfSpaceMarker
+    elseIfNoSpaceMarker = "elseif"
+    elseIfSpaceMarker   = "else" ws "if"
+    elseMarker          = "else"
+    endIfMarker         = "end"
+
+    standardMarker      = setMarker
+                        | actMarker | endActMarker
+                        | ifMarker | elseIfNoSpaceMarker | elseMarker | endIfMarker
+
+    binaryKeywordOperator   = "and" | "or" | "mod"
+    binaryStandardOperator  = "<>" | "<=" | "=<" | ">=" | "=>" | "!" | "=" | "<" | ">" | "+" | "-" | "*" | "/"
+    binaryExtendedOperator  = binaryStandardOperator | "&"
+    binaryImplicitOperator  = "<>" | "!" | "<" ~"=" | ">" ~"=" | "+" | "-" | "*" | "/"
+
+    unaryKeywordOperator    = "no" | "obj" | "loc"
+    unaryStandardOperator   = "-" | "+" /* Unary plus is ignored */
+
+    /* Priority | Operations
+       ---------|--------------------------------
+       4        | & (value concatenation)
+       6        | or
+       7        | and
+       8        | no, loc, obj
+       10       | !, <>, <=, =<, >=, =>, =, <, >
+       14       | +, -
+       16       | mod
+       17       | *, /
+       18       | - (unary negation)
+       30       | ALL REGULAR FUNCTIONS
+       127      | ( ) PARENTHESES
+
+       NO, LOC, OBJ are functions with priority 8: "no (a) = b" means "no ((a) = b)"
+    */
+
+    /* END, ELSEIF, ELSE are pseudo-statements, but we don't include them here to help with identifying suspicious code */
+    statementName           = "play"
+                            | "close all"
+                            | "close"
+                            | "view"
+                            | "exit"
+                            | "exec"
+                            | "jump"
+                            | "gosub" | "gs"
+                            | "goto" | "gt"
+                            | "xgoto" | "xgt"
+                            | "pl"
+                            | "p"
+                            | "nl"
+                            | "clear" | "clr"
+                            | "*pl"
+                            | "*p"
+                            | "*nl"
+                            | "*clear" | "*clr"
+                            | "msg"
+                            | "wait"
+                            | "addobj" | "add obj"
+                            | "delobj" | "del obj"
+                            | "killobj"
+                            | "unselect" | "unsel"
+                            | "killall"
+                            | "cla"
+                            | "delact" | "del act"
+                            | "cls"
+                            | "cmdclear" | "cmdclr"
+                            | "menu"
+                            | "settimer"
+                            | "dynamic"
+                            | "killvar"
+                            | "copyarr"
+                            | "opengame"
+                            | "savegame"
+                            | "openqst"
+                            | "addqst"
+                            | "killqst"
+                            | "refint"
+                            | "showacts"
+                            | "showinput"
+                            | "showobjs"
+                            | "showstat"
+
+    noArgsStrFunctionName     = "qspver"
+                              | "user_text" | "usrtxt"
+                              | "curloc"
+                              | "selobj"
+                              | "selact"
+                              | "maintxt"
+                              | "stattxt"
+                              | "curacts"
+
+    noArgsNumFunctionName     = "rnd"
+                              | "countobj"
+                              | "msecscount"
+
+    singleArgStrFunctionName  = "min"
+                              | "max"
+                              | "lcase"
+                              | "ucase"
+                              | "input"
+                              | "str"
+                              | "desc"
+                              | "trim"
+                              | "getobj"
+                              | "func"
+                              | "dyneval"
+
+    singleArgNumFunctionName  = "rand"
+                              | "len"
+                              | "isnum"
+                              | "val"
+                              | "arrsize"
+                              | "isplay"
+
+    multiArgsStrFunctionName  = "iif"
+                              | "strfind"
+                              | "mid"
+                              | "replace"
+
+    multiArgsNumFunctionName  = "rgb"
+                              | "strcomp"
+                              | "strpos"
+                              | "arrpos"
+                              | "arrcomp"
+                              | "instr"
+}
