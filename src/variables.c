@@ -284,10 +284,22 @@ INLINE QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
 {
 	int count, oldCount = var->ValsCount;
+	QSPVarValue *values;
 	if (ind >= oldCount)
 	{
-		count = var->ValsCount = ind + 1;
-		var->Values = (QSPVarValue *)realloc(var->Values, count * sizeof(QSPVarValue));
+		if (ind == INT_MAX || (size_t)ind + 1 > (size_t)-1 / sizeof(QSPVarValue))
+		{
+			qspSetError(QSP_ERR_TOOMANYITEMS);
+			return;
+		}
+		count = ind + 1;
+		if (!(values = (QSPVarValue *)realloc(var->Values, count * sizeof(QSPVarValue))))
+		{
+			qspSetError(QSP_ERR_TOOMANYITEMS);
+			return;
+		}
+		var->Values = values;
+		var->ValsCount = count;
 		while (oldCount < count)
 		{
 			var->Values[oldCount].Num = 0;
