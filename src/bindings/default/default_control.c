@@ -449,10 +449,25 @@ QSP_BOOL QSPLoadGameWorldFromFile(const QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 /* Load game from memory */
 QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, QSP_BOOL isAddLocs)
 {
+	char *buf;
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	qspOpenQuestFromData((char *)data, dataSize, isAddLocs);
+	if (dataSize < 2 || dataSize > INT_MAX - 3)
+	{
+		qspSetError(QSP_ERR_CANTLOADFILE);
+		return QSP_FALSE;
+	}
+	buf = (char *)malloc(dataSize + 3);
+	if (!buf)
+	{
+		qspSetError(QSP_ERR_CANTLOADFILE);
+		return QSP_FALSE;
+	}
+	memcpy(buf, data, dataSize);
+	buf[dataSize] = buf[dataSize + 1] = buf[dataSize + 2] = 0;
+	qspOpenQuestFromData(buf, dataSize, isAddLocs);
+	free(buf);
 	if (qspErrorNum) return QSP_FALSE;
 	return QSP_TRUE;
 }
