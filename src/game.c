@@ -474,7 +474,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 		if ((ind += 2) > strsCount) return QSP_FALSE;
 		if (ind + 1 > strsCount) return QSP_FALSE;
 		linesCount = qspReCodeGetIntVal(strs[ind++]);
-		if (linesCount < 0 || (ind + 2 * linesCount) > strsCount) return QSP_FALSE;
+		if (linesCount < 0 || linesCount > (strsCount - ind) / 2) return QSP_FALSE;
 		for (j = 0; j < linesCount; ++j)
 		{
 			++ind;
@@ -503,10 +503,12 @@ INLINE QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 		if (++ind > strsCount) return QSP_FALSE;
 		if (ind + 1 > strsCount) return QSP_FALSE;
 		temp = qspReCodeGetIntVal(strs[ind++]);
-		if (temp < 0 || (ind += 2 * temp) > strsCount) return QSP_FALSE;
+		if (temp < 0 || temp > (strsCount - ind) / 2) return QSP_FALSE;
+		ind += 2 * temp;
 		if (ind + 1 > strsCount) return QSP_FALSE;
 		temp = qspReCodeGetIntVal(strs[ind++]);
-		if (temp < 0 || (ind += 2 * temp) > strsCount) return QSP_FALSE;
+		if (temp < 0 || temp > (strsCount - ind) / 2) return QSP_FALSE;
+		ind += 2 * temp;
 	}
 	return QSP_TRUE;
 }
