@@ -719,7 +719,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_openSavedGameF
 	if (dataSize % sizeof(QSP_CHAR) != 0) return QSP_FALSE;
 
 	const int dataLen = dataSize / sizeof(QSP_CHAR);
-	QSP_CHAR *ptr = malloc(dataLen * sizeof(QSP_CHAR));
+	QSP_CHAR *ptr = malloc((dataLen + 1) * sizeof(QSP_CHAR));
 	if (ptr == NULL) return QSP_FALSE;
 
 	(*env)->GetByteArrayRegion(env, data, 0, dataSize, (jbyte *)ptr);
