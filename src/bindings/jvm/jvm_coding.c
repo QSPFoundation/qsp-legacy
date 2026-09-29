@@ -171,11 +171,11 @@ QSP_CHAR *ndkFromJavaString(JNIEnv *env, jstring str)
 {
 	if (!str) return 0;
 	jsize length;
-	jchar *chars;
+	const jchar *chars;
 	QSP_CHAR *res;
 	length = (*env)->GetStringLength(env, str);
 	chars = (*env)->GetStringChars(env, str, 0);
-	res = qspGetNewText(chars, length);
+	res = qspGetNewText((QSP_CHAR *)chars, length);
 	(*env)->ReleaseStringChars(env, str, chars);
 	return res;
 }

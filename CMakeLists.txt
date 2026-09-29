@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+﻿cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(qsp-legacy VERSION 5.7.0)
 
 set(QSP_LEGACY_GAMEMIN_VER "5.7.0")
@@ -112,8 +112,18 @@ set(QSP_LEGACY_SOURCES
 		src/variant.c src/variant.h
 )
 add_library(qsp-legacy SHARED ${QSP_LEGACY_SOURCES})
-target_compile_features(qsp-legacy PRIVATE c_std_17)
-set_target_properties(qsp-legacy PROPERTIES C_STANDARD 17 C_STANDARD_REQUIRED ON)
+target_compile_features(qsp-legacy PUBLIC c_std_11)
+set_target_properties(qsp-legacy PROPERTIES C_STANDARD 17 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
+if (NOT WIN32)
+	target_compile_definitions(qsp-legacy PRIVATE _POSIX_C_SOURCE=200809L _DEFAULT_SOURCE)
+endif()
+if ("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
+	target_compile_options(qsp-legacy PRIVATE
+			-Werror=incompatible-pointer-types
+			-Werror=implicit-function-declaration
+			-Werror=int-conversion
+	)
+endif()
 target_compile_definitions(qsp-legacy PUBLIC _UNICODE)
 if (WIN32)
 	target_compile_definitions(qsp-legacy PRIVATE _CRT_SECURE_NO_WARNINGS)
