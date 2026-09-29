@@ -87,7 +87,7 @@ QSP_CHAR *qspGetAddText(QSP_CHAR *dest, QSP_CHAR *val, int destLen, int valLen)
 	return dest;
 }
 
-QSP_BOOL qspClearText(void **text, int *textLen)
+QSP_BOOL qspClearText(QSP_CHAR **text, int *textLen)
 {
 	if (*text)
 	{
@@ -329,7 +329,7 @@ void qspCopyStrs(QSP_CHAR ***dest, QSP_CHAR **src, int start, int end)
 		*dest = 0;
 }
 
-void qspFreeStrs(void **strs, int count)
+void qspFreeStrs(QSP_CHAR **strs, int count)
 {
 	if (strs)
 	{

@@ -437,6 +437,15 @@ int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
 	return count;
 }
 
+void qspFreeGameStrs(char **strs, int count)
+{
+	if (strs)
+	{
+		while (--count >= 0) free(strs[count]);
+		free(strs);
+	}
+}
+
 int qspReCodeGetIntVal(QSP_CHAR *val)
 {
 	int num;

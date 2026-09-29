@@ -237,7 +237,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isAddLocs)
 	if (!qspCheckQuest(strs, count, isUCS2))
 	{
 		qspSetError(QSP_ERR_CANTLOADFILE);
-		qspFreeStrs(strs, count);
+		qspFreeGameStrs(strs, count);
 		return;
 	}
 	buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
@@ -302,7 +302,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isAddLocs)
 		else
 			ind += actsCount * (isOldFormat ? 2 : 3);
 	}
-	qspFreeStrs(strs, count);
+	qspFreeGameStrs(strs, count);
 	qspLocsCount = end;
 	qspCreateWorld(end, locsCount);
 	count = locsCount - start;
