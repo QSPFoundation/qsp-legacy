@@ -75,6 +75,7 @@ void qspTerminateRuntime(void)
 {
 	qspMemClear(QSP_FALSE);
 	qspCreateWorld(0, 0);
+	qspResetError();
 }
 
 void qspPrepareExecution()
