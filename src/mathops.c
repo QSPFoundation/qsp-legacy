@@ -1013,7 +1013,7 @@ INLINE void qspFunctionRGB(QSPVariant *args, int count, QSPVariant *tos)
 		b = 0;
 	else if (b > 255)
 		b = 255;
-	QSP_PNUM(tos) = (a << 24) | (b << 16) | (g << 8) | r;
+	QSP_PNUM(tos) = (int)(((unsigned int)a << 24) | ((unsigned int)b << 16) | ((unsigned int)g << 8) | (unsigned int)r);
 }
 
 INLINE void qspFunctionMid(QSPVariant *args, int count, QSPVariant *tos)
