@@ -198,7 +198,7 @@ void qspCallShowMessage(QSP_CHAR* text)
 
 int qspCallShowMenu(QSPListItem *items, int count)
 {
-	if (qspCallBacks[QSP_CALL_SHOWMENU]) {
+	if (qspCallBacks[QSP_CALL_SHOWMENU] && ndkListItemClass) {
 		QSPCallState state;
 		int i, index;
 		JNIListItem *jniItems;

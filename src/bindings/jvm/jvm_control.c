@@ -88,6 +88,7 @@ JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_enableDebugMode(JN
 /* Getting current state data */
 JNIEXPORT jobject JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getCurStateData(JNIEnv *env, jobject this)
 {
+	if (ndkExecutionStateClass == 0) return NULL;
 	jobject jniExecutionState = (*env)->AllocObject(env, ndkExecutionStateClass);
 
 	QSP_CHAR *locName = ((qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount) ? qspLocs[qspRealCurLoc].Name : 0);
@@ -181,7 +182,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getActions
 	int i;
 	JNIListItem item;
 
-	if (qspCurActionsCount < 0) return NULL;
+	if (qspCurActionsCount < 0 || ndkListItemClass == 0) return NULL;
 
 	jobjectArray res = (*env)->NewObjectArray(env, qspCurActionsCount, ndkListItemClass, NULL);
 
@@ -252,7 +253,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getObjects
 	int i;
 	JNIListItem item;
 
-	if (qspCurObjectsCount < 0) return NULL;
+	if (qspCurObjectsCount < 0 || ndkListItemClass == 0) return NULL;
 
 	jobjectArray res = (*env)->NewObjectArray(env, qspCurObjectsCount, ndkListItemClass, NULL);
 
@@ -749,6 +750,43 @@ JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_restartGame(JN
 }
 
 /* Initialization */
+
+/* A missing class gives NULL instead of a pending NoClassDefFoundError */
+static jclass ndkFindClass(JNIEnv *env, const char *name)
+{
+	jclass res, clazz = (*env)->FindClass(env, name);
+	if (clazz == NULL)
+	{
+		(*env)->ExceptionClear(env);
+		return NULL;
+	}
+	res = (jclass)(*env)->NewGlobalRef(env, clazz);
+	(*env)->DeleteLocalRef(env, clazz);
+	return res;
+}
+
+static jmethodID ndkGetCallBack(JNIEnv *env, const char *name, const char *sig, QSP_BOOL isReported)
+{
+	jmethodID res;
+	if (ndkApiClass == NULL) return NULL;
+	res = (*env)->GetMethodID(env, ndkApiClass, name, sig);
+	if (res == NULL)
+	{
+		if (isReported) (*env)->ExceptionDescribe(env);
+		(*env)->ExceptionClear(env);
+	}
+	return res;
+}
+
+static void ndkDeleteGlobalRef(JNIEnv *env, jobject *ref)
+{
+	if (*ref)
+	{
+		(*env)->DeleteGlobalRef(env, *ref);
+		*ref = NULL;
+	}
+}
+
 JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_init(JNIEnv *env, jobject this)
 {
 	qspInitRuntime();
@@ -756,39 +794,31 @@ JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_init(JNIEnv *env, 
 	/* Get JVM references */
 	(*env)->GetJavaVM(env, &ndkJvm);
 
-	jclass clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib");
-	ndkApiClass = (*env)->NewGlobalRef(env, clazz);
+	ndkApiClass = ndkFindClass(env, "com/libqsplegacy/jni/QSPLegacyLib");
 	ndkApiObject = (*env)->NewGlobalRef(env, this);
 
-	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ListItem");
-	ndkListItemClass = (*env)->NewGlobalRef(env, clazz);
-
-	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ExecutionState");
-	ndkExecutionStateClass = (*env)->NewGlobalRef(env, clazz);
-
-	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ErrorData");
-	ndkErrorInfoClass = (*env)->NewGlobalRef(env, clazz);
-
-	clazz = (*env)->FindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$VarValResp");
-	ndkVarValResp = (*env)->NewGlobalRef(env, clazz);
+	ndkListItemClass = ndkFindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ListItem");
+	ndkExecutionStateClass = ndkFindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ExecutionState");
+	ndkErrorInfoClass = ndkFindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$ErrorData");
+	ndkVarValResp = ndkFindClass(env, "com/libqsplegacy/jni/QSPLegacyLib$VarValResp");
 
 	/* Get references to callbacks */
-	qspSetCallBack(QSP_CALL_DEBUG, (*env)->GetMethodID(env, ndkApiClass, "onCallDebug", "(Ljava/lang/String;)V"));
-	qspSetCallBack(QSP_CALL_ISPLAYINGFILE, (*env)->GetMethodID(env, ndkApiClass, "onIsPlayingFile", "(Ljava/lang/String;)Z"));
-	qspSetCallBack(QSP_CALL_PLAYFILE, (*env)->GetMethodID(env, ndkApiClass, "onPlayFile", "(Ljava/lang/String;I)V"));
-	qspSetCallBack(QSP_CALL_CLOSEFILE, (*env)->GetMethodID(env, ndkApiClass, "onCloseFile", "(Ljava/lang/String;)V"));
-	qspSetCallBack(QSP_CALL_SHOWIMAGE, (*env)->GetMethodID(env, ndkApiClass, "onShowImage", "(Ljava/lang/String;)V"));
-	qspSetCallBack(QSP_CALL_SHOWWINDOW, (*env)->GetMethodID(env, ndkApiClass, "onShowWindow", "(IZ)V"));
-    qspSetCallBack(QSP_CALL_SHOWMENU, (*env)->GetMethodID(env, ndkApiClass, "onShowMenu", "([Lcom/libqsplegacy/jni/QSPLegacyLib$ListItem;)I"));
-	qspSetCallBack(QSP_CALL_SHOWMSGSTR, (*env)->GetMethodID(env, ndkApiClass, "onShowMessage", "(Ljava/lang/String;)V"));
-	qspSetCallBack(QSP_CALL_REFRESHINT, (*env)->GetMethodID(env, ndkApiClass, "onRefreshInt", "()V"));
-	qspSetCallBack(QSP_CALL_SETTIMER, (*env)->GetMethodID(env, ndkApiClass, "onSetTimer", "(I)V"));
-	qspSetCallBack(QSP_CALL_OPENGAME, (*env)->GetMethodID(env, ndkApiClass, "onOpenGame", "(Ljava/lang/String;Z)V"));
-	qspSetCallBack(QSP_CALL_OPENGAMESTATUS, (*env)->GetMethodID(env, ndkApiClass, "onOpenGameStatus", "(Ljava/lang/String;)V"));
-	qspSetCallBack(QSP_CALL_SAVEGAMESTATUS, (*env)->GetMethodID(env, ndkApiClass, "onSaveGameStatus", "(Ljava/lang/String;)V"));
-	qspSetCallBack(QSP_CALL_SLEEP, (*env)->GetMethodID(env, ndkApiClass, "onSleep", "(I)V"));
-	qspSetCallBack(QSP_CALL_GETMSCOUNT, (*env)->GetMethodID(env, ndkApiClass, "onGetMsCount", "()I"));
-	qspSetCallBack(QSP_CALL_INPUTBOX, (*env)->GetMethodID(env, ndkApiClass, "onInputBox", "(Ljava/lang/String;)Ljava/lang/String;"));
+	qspSetCallBack(QSP_CALL_DEBUG, ndkGetCallBack(env, "onCallDebug", "(Ljava/lang/String;)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_ISPLAYINGFILE, ndkGetCallBack(env, "onIsPlayingFile", "(Ljava/lang/String;)Z", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_PLAYFILE, ndkGetCallBack(env, "onPlayFile", "(Ljava/lang/String;I)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_CLOSEFILE, ndkGetCallBack(env, "onCloseFile", "(Ljava/lang/String;)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_SHOWIMAGE, ndkGetCallBack(env, "onShowImage", "(Ljava/lang/String;)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_SHOWWINDOW, ndkGetCallBack(env, "onShowWindow", "(IZ)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_SHOWMENU, ndkGetCallBack(env, "onShowMenu", "([Lcom/libqsplegacy/jni/QSPLegacyLib$ListItem;)I", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_SHOWMSGSTR, ndkGetCallBack(env, "onShowMessage", "(Ljava/lang/String;)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_REFRESHINT, ndkGetCallBack(env, "onRefreshInt", "()V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_SETTIMER, ndkGetCallBack(env, "onSetTimer", "(I)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_OPENGAME, ndkGetCallBack(env, "onOpenGame", "(Ljava/lang/String;Z)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_OPENGAMESTATUS, ndkGetCallBack(env, "onOpenGameStatus", "(Ljava/lang/String;)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_SAVEGAMESTATUS, ndkGetCallBack(env, "onSaveGameStatus", "(Ljava/lang/String;)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_SLEEP, ndkGetCallBack(env, "onSleep", "(I)V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_GETMSCOUNT, ndkGetCallBack(env, "onGetMsCount", "()I", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_INPUTBOX, ndkGetCallBack(env, "onInputBox", "(Ljava/lang/String;)Ljava/lang/String;", QSP_TRUE));
 }
 
 /* Deinitialization */
@@ -797,12 +827,12 @@ JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_terminate(JNIEnv *
 	qspTerminateRuntime();
 
 	/* Release references */
-	(*env)->DeleteGlobalRef(env, ndkApiObject);
-	(*env)->DeleteGlobalRef(env, ndkApiClass);
-	(*env)->DeleteGlobalRef(env, ndkListItemClass);
-	(*env)->DeleteGlobalRef(env, ndkExecutionStateClass);
-	(*env)->DeleteGlobalRef(env, ndkErrorInfoClass);
-	(*env)->DeleteGlobalRef(env, ndkVarValResp);
+	ndkDeleteGlobalRef(env, &ndkApiObject);
+	ndkDeleteGlobalRef(env, &ndkApiClass);
+	ndkDeleteGlobalRef(env, &ndkListItemClass);
+	ndkDeleteGlobalRef(env, &ndkExecutionStateClass);
+	ndkDeleteGlobalRef(env, &ndkErrorInfoClass);
+	ndkDeleteGlobalRef(env, &ndkVarValResp);
 }
 
 #endif
