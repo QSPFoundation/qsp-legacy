@@ -481,7 +481,7 @@ static void listState(StrBuf *sb, int isActions)
 }
 
 /* Like onRefresh() of qsp-wasm-engine: isRedraw forces the update of every window */
-static int cbRefresh(QSP_BOOL isRedraw)
+static void cbRefresh(QSP_BOOL isRedraw)
 {
 	StrBuf sb = {0};
 	/* An empty description is logged without the text, so the event has no trailing space */
@@ -501,10 +501,9 @@ static int cbRefresh(QSP_BOOL isRedraw)
 		addEvent(sbStr(&sb));
 	}
 	free(sb.Data);
-	return 0;
 }
 
-static int cbDebug(QSP_CHAR *str)
+static void cbDebug(const QSP_CHAR *str)
 {
 	/* debug LOCATION:LINE:ACTION CODE */
 	StrBuf sb = {0};
@@ -517,15 +516,14 @@ static int cbDebug(QSP_CHAR *str)
 	addEscaped(&sb, str);
 	addEvent(sbStr(&sb));
 	free(sb.Data);
-	return 0;
 }
-static int cbMsg(QSP_CHAR *str) { eventWithText("msg", str); return 0; }
-static int cbView(QSP_CHAR *file) { eventWithText("view", file); return 0; }
-static int cbSystem(QSP_CHAR *str) { eventWithText("system_cmd", str); return 0; }
-static int cbSetInput(QSP_CHAR *text) { eventWithText("user_input", text); return 0; }
-static int cbCloseFile(QSP_CHAR *file) { eventWithText("close_file", file); return 0; }
+static void cbMsg(const QSP_CHAR *str) { eventWithText("msg", str); }
+static void cbView(const QSP_CHAR *file) { eventWithText("view", file); }
+static void cbSystem(const QSP_CHAR *str) { eventWithText("system_cmd", str); }
+static void cbSetInput(const QSP_CHAR *text) { eventWithText("user_input", text); }
+static void cbCloseFile(const QSP_CHAR *file) { eventWithText("close_file", file); }
 
-static int cbPlayFile(QSP_CHAR *file, int volume)
+static void cbPlayFile(const QSP_CHAR *file, int volume)
 {
 	StrBuf sb = {0};
 	sbAdd(&sb, "play_file ");
@@ -533,10 +531,9 @@ static int cbPlayFile(QSP_CHAR *file, int volume)
 	sbAddf(&sb, " %d", volume);
 	addEvent(sbStr(&sb));
 	free(sb.Data);
-	return 0;
 }
 
-static int cbIsPlay(QSP_CHAR *file)
+static QSP_BOOL cbIsPlay(const QSP_CHAR *file)
 {
 	int ret = 0, i;
 	eventWithText("is_play", file);
@@ -549,12 +546,11 @@ static int cbIsPlay(QSP_CHAR *file)
 	return ret;
 }
 
-static int cbShowWindow(int type, QSP_BOOL isShow)
+static void cbShowWindow(int type, QSP_BOOL isShow)
 {
 	char buf[64];
 	snprintf(buf, sizeof(buf), "panel_visibility %d %d", type, isShow ? 1 : 0);
 	addEvent(buf);
-	return 0;
 }
 
 static int cbMenu(QSPListItem *items, int count)
@@ -574,7 +570,7 @@ static int cbMenu(QSPListItem *items, int count)
 	return ret;
 }
 
-static int cbInput(QSP_CHAR *text, QSP_CHAR *buffer, int maxLen)
+static void cbInput(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen)
 {
 	eventWithText("input", text);
 	buffer[0] = 0;
@@ -590,23 +586,20 @@ static int cbInput(QSP_CHAR *text, QSP_CHAR *buffer, int maxLen)
 		for (i = 1; i < T.InputRepliesCount; ++i) T.InputReplies[i - 1] = T.InputReplies[i];
 		--T.InputRepliesCount;
 	}
-	return 0;
 }
 
-static int cbSleep(int msecs)
+static void cbSleep(int msecs)
 {
 	char buf[64];
 	snprintf(buf, sizeof(buf), "wait %d", msecs);
 	addEvent(buf);
-	return 0;
 }
 
-static int cbSetTimer(int msecs)
+static void cbSetTimer(int msecs)
 {
 	char buf[64];
 	snprintf(buf, sizeof(buf), "timer %d", msecs);
 	addEvent(buf);
-	return 0;
 }
 
 static int cbGetMsCount(void)
@@ -626,7 +619,7 @@ static char *toUtf8(const QSP_CHAR *s)
 static void loadGame(Game *game, QSP_BOOL isAddLocs);
 static void afterCall(QSP_BOOL isOk);
 
-static int cbOpenGame(QSP_CHAR *file, QSP_BOOL isAddLocs)
+static void cbOpenGame(const QSP_CHAR *file, QSP_BOOL isAddLocs)
 {
 	StrBuf sb = {0};
 	char *name = toUtf8(file);
@@ -645,7 +638,6 @@ static int cbOpenGame(QSP_CHAR *file, QSP_BOOL isAddLocs)
 		}
 	}
 	free(name);
-	return 0;
 }
 
 static SaveSlot *findSave(const char *name, int toCreate)
@@ -691,22 +683,20 @@ static void loadFromSlot(const char *name)
 	if (slot && slot->Data) afterCall(QSPOpenSavedGameFromData(slot->Data, QSP_FALSE));
 }
 
-static int cbSaveGame(QSP_CHAR *file)
+static void cbSaveGame(const QSP_CHAR *file)
 {
 	char *name = toUtf8(file);
 	eventWithText("save_game", file);
 	saveToSlot(file ? name : "");
 	free(name);
-	return 0;
 }
 
-static int cbOpenSave(QSP_CHAR *file)
+static void cbOpenSave(const QSP_CHAR *file)
 {
 	char *name = toUtf8(file);
 	eventWithText("load_save", file);
 	loadFromSlot(file ? name : "");
 	free(name);
-	return 0;
 }
 
 static void setCallbacks(void)
