@@ -1060,7 +1060,7 @@ INLINE void qspFunctionDesc(QSPVariant *args, int count, QSPVariant *tos)
 		qspSetError(QSP_ERR_LOCNOTFOUND);
 		return;
 	}
-	if (!(desc = qspFormatText(qspLocs[index].Desc, QSP_FALSE))) return;
+	if (!(desc = qspFormatLocText(qspLocs[index].Desc))) return;
 	QSP_PSTR(tos) = desc;
 }
 
