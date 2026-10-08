@@ -816,7 +816,7 @@ JNIEXPORT void JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_init(JNIEnv *env, 
 	qspSetCallBack(QSP_CALL_SHOWWINDOW, ndkGetCallBack(env, "onShowWindow", "(IZ)V", QSP_TRUE));
 	qspSetCallBack(QSP_CALL_SHOWMENU, ndkGetCallBack(env, "onShowMenu", "([Lcom/libqsplegacy/jni/QSPLegacyLib$ListItem;)I", QSP_TRUE));
 	qspSetCallBack(QSP_CALL_SHOWMSGSTR, ndkGetCallBack(env, "onShowMessage", "(Ljava/lang/String;)V", QSP_TRUE));
-	qspSetCallBack(QSP_CALL_REFRESHINT, ndkGetCallBack(env, "onRefreshInt", "()V", QSP_TRUE));
+	qspSetCallBack(QSP_CALL_REFRESHINT, ndkGetCallBack(env, "onRefreshInt", "(Z)V", QSP_TRUE));
 	qspSetCallBack(QSP_CALL_SETTIMER, ndkGetCallBack(env, "onSetTimer", "(I)V", QSP_TRUE));
 	qspSetCallBack(QSP_CALL_OPENGAME, ndkGetCallBack(env, "onOpenGame", "(Ljava/lang/String;Z)V", QSP_TRUE));
 	qspSetCallBack(QSP_CALL_OPENGAMESTATUS, ndkGetCallBack(env, "onOpenGameStatus", "(Ljava/lang/String;)V", QSP_TRUE));

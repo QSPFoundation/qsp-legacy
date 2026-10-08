@@ -96,7 +96,7 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 		QSPCallState state;
 
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		(*javaEnv)->CallVoidMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_REFRESHINT], isRedraw);
+		(*javaEnv)->CallVoidMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_REFRESHINT], (jboolean)isRedraw);
 		ndkCheckException(javaEnv);
 		qspRestoreCallState(&state);
 	}
