@@ -1,0 +1,16 @@
+// Ported from qsp-wasm-engine tests/engine/msg.test.ts
+
+@test MSG should trigger event in api
+@src
+msg 'works'
+@run
+@expect event msg works
+
+// qsp-legacy doesn't refresh the UI before MSG, so there's no "main_changed 1" event
+@test msg should stop execution flow
+@src
+*p '1' & msg 'works' & *p '2'
+@run
+@expect events
+msg works
+main_changed 12

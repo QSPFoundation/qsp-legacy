@@ -1,0 +1,63 @@
+// Ported from qsp-wasm-engine tests/engine/inputs.test.ts
+// Panels: 0 - actions, 1 - objects, 2 - stats, 3 - user input
+
+@test SHOWINPUT should toggle user cmd visibility
+@src
+SHOWINPUT 0
+@run
+@expect event panel_visibility 3 0
+@exec SHOWINPUT 1
+@expect event panel_visibility 3 1
+
+@test USER_TEXT should return text from user cmd
+@set-input works
+@src
+$text = USER_TEXT
+@run
+@expect $text => 'works'
+
+@test USRTXT should return text from user cmd
+@set-input works
+@src
+$text = USRTXT
+@run
+@expect $text => 'works'
+
+// qsp-legacy passes NULL instead of an empty string to clear the user input
+@test CMDCLEAR should clear user input
+@set-input works
+@src
+$textBefore = USRTXT & CMDCLEAR & $textAfter = USRTXT
+@run
+@expect event user_input
+@expect $textBefore => 'works'
+@expect $textAfter => ''
+
+@test CMDCLR should clear user input
+@set-input works
+@src
+$textBefore = USRTXT & CMDCLR & $textAfter = USRTXT
+@run
+@expect event user_input
+@expect $textBefore => 'works'
+@expect $textAfter => ''
+
+@test CLS should clear user input
+@set-input works
+@src
+$textBefore = USRTXT & CLS & $textAfter = USRTXT
+@run
+@expect event user_input
+@expect $textBefore => 'works'
+@expect $textAfter => ''
+
+// qsp-legacy doesn't refresh the UI before INPUT, so there's no "main_changed 1" event
+@test INPUT should interrupt execution flow and receive entered text
+@reply input Answer
+@src
+*p '1' & $text = $input('Question?') & *p '2'
+@run
+@expect events
+input Question?
+main_changed 12
+@expect $text => 'Answer'

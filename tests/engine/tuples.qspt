@@ -1,0 +1,107 @@
+// Ported from qsp-wasm-engine tests/engine/tuples.test.ts
+// tuples are not supported by qsp-legacy (QSP 5.7), so these tests are kept only to track the coverage
+
+@test default tuple value
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test defining tuple with parenthesis
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test nested tuple with parenthesis
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test defining tuple with brackets
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test nested tuple with brackets
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test defining tuple with comma
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test mixing brackets and parenthesis
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test strings and numbers
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test single item tuple with parenthesis
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test single item tuple with brackets
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test empty tuple with parenthesis
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test empty tuple with brackets
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test nested tuple with single item
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test nested single item in parenthesis will not create a tuple
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test array of tuples
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test unpacking to variables
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test unpacking mixed values
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test using tuple to grab rest of values
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test rest tuple should be empty if there were no values left
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test swapping value without tmp variable
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test using tuple as array index
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test using nested tuple as array index
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test using mixed value tuple for indexing
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test value & tuple
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test tuple & value
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test tuple & tuple
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test deleting by tuple key
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test it should return tuple size
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test passing tuple as parameter
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test returning tuple from function
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test unpacking returning tuple from function
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test returning tuple from dyneval
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test defining menu with tuples
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test it errors out on more than 20 elements
+@skip tuples are not supported by qsp-legacy (QSP 5.7)
+
+@test can grow over 20 elements with concatenation
+@skip tuples are not supported by qsp-legacy (QSP 5.7)

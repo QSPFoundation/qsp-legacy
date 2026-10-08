@@ -1,0 +1,29 @@
+// Ported from qsp-wasm-engine tests/engine/loop.test.ts
+// LOOP is not supported by qsp-legacy (QSP 5.7), so these tests are kept only to track the coverage
+
+@test loop should not start if condition not met
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test loop should stop if condition is changed inside loop
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test step should be called on every loop run
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test local vars should be for loop only
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test processing arrays with loop
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test EXIT stops whole location not just loop
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test can JUMP outside loop
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test multi line loop supports comments
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)
+
+@test multiline loop requires colon
+@skip LOOP is not supported by qsp-legacy (QSP 5.7)

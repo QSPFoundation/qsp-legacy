@@ -1,0 +1,16 @@
+// Ported from qsp-wasm-engine tests/engine/exec.test.ts
+
+@test should trigger callback
+@src
+exec('test')
+@run
+@expect event system_cmd test
+
+// qsp-legacy doesn't refresh the UI before EXEC, so there's no "main_changed before" event
+@test should update ui on call
+@src
+*p 'before' & exec('test') & *p '-after'
+@run
+@expect events
+system_cmd test
+main_changed before-after
