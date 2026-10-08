@@ -191,52 +191,19 @@ FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 
 char *qspReadFileData(FILE *f, int padding, int *dataSize)
 {
-	char *buf, *newBuf;
+	char *buf;
 	long fileSize;
-	size_t len = 0, readSize, bufSize = 64 * 1024, maxSize = (size_t)(INT_MAX - padding);
-	/* The file size is only a hint: non-seekable streams (e.g. pipes) are read till EOF */
-	if (!fseek(f, 0, SEEK_END))
-	{
-		fileSize = ftell(f);
-		if (fileSize >= 0 && (unsigned long)fileSize < maxSize) bufSize = (size_t)fileSize + 1;
-		if (fseek(f, 0, SEEK_SET)) return 0;
-	}
-	else
-		clearerr(f);
-	if (!(buf = (char *)malloc(bufSize))) return 0;
-	while ((readSize = fread(buf + len, 1, bufSize - len, f)) == bufSize - len)
-	{
-		len = bufSize;
-		if (bufSize == maxSize)
-		{
-			free(buf);
-			return 0;
-		}
-		bufSize = (bufSize > maxSize / 2 ? maxSize : bufSize * 2);
-		if (!(newBuf = (char *)realloc(buf, bufSize)))
-		{
-			free(buf);
-			return 0;
-		}
-		buf = newBuf;
-	}
-	len += readSize;
-	if (ferror(f))
+	if (fseek(f, 0, SEEK_END) || (fileSize = ftell(f)) < 0 ||
+		fileSize > INT_MAX - padding || fseek(f, 0, SEEK_SET))
+		return 0;
+	if (!(buf = (char *)malloc((size_t)fileSize + padding))) return 0;
+	if (fread(buf, 1, (size_t)fileSize, f) != (size_t)fileSize)
 	{
 		free(buf);
 		return 0;
 	}
-	if (bufSize - len < (size_t)padding)
-	{
-		if (!(newBuf = (char *)realloc(buf, len + padding)))
-		{
-			free(buf);
-			return 0;
-		}
-		buf = newBuf;
-	}
-	memset(buf + len, 0, padding);
-	*dataSize = (int)len;
+	memset(buf + fileSize, 0, padding);
+	*dataSize = (int)fileSize;
 	return buf;
 }
 
