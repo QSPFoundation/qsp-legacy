@@ -202,23 +202,23 @@ int qspCallShowMenu(QSPListItem *items, int count)
 	if (qspCallBacks[QSP_CALL_SHOWMENU] && ndkListItemClass && (javaEnv = ndkGetJniEnv())) {
 		QSPCallState state;
 		int i, index;
-		JNIListItem *jniItems;
+		JNIListItem jniItem;
 		jobjectArray jniMenuArray;
 
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
 
-		/* Allocate an array */
+		/* Allocate an array, the array keeps the items so their local references are released at once */
 		jniMenuArray = (*javaEnv)->NewObjectArray(javaEnv, count, ndkListItemClass, 0);
 		if (ndkCheckException(javaEnv))
 		{
 			qspRestoreCallState(&state);
 			return -1;
 		}
-		jniItems = (JNIListItem *)malloc(count * sizeof(JNIListItem));
 		for (i = 0; i < count; ++i)
 		{
-			jniItems[i] = ndkToJavaListItem(javaEnv, items[i].Name, items[i].Image);
-			(*javaEnv)->SetObjectArrayElement(javaEnv, jniMenuArray, i, jniItems[i].ListItem);
+			jniItem = ndkToJavaListItem(javaEnv, items[i].Name, items[i].Image);
+			(*javaEnv)->SetObjectArrayElement(javaEnv, jniMenuArray, i, jniItem.ListItem);
+			ndkReleaseJavaListItem(javaEnv, &jniItem);
 		}
 
 		/* Process user input */
@@ -226,10 +226,7 @@ int qspCallShowMenu(QSPListItem *items, int count)
 		if (ndkCheckException(javaEnv)) index = -1;
 
 		/* Deallocate the resources */
-		for (i = 0; i < count; ++i)
-			ndkReleaseJavaListItem(javaEnv, jniItems + i);
 		(*javaEnv)->DeleteLocalRef(javaEnv, jniMenuArray);
-		free(jniItems);
 
 		qspRestoreCallState(&state);
 
@@ -359,7 +356,10 @@ QSP_CHAR* qspCallInputBox(QSP_CHAR* text)
 		jstring jResult = (*javaEnv)->CallObjectMethod(javaEnv, ndkApiObject, qspCallBacks[QSP_CALL_INPUTBOX], qspText);
 		if (ndkCheckException(javaEnv)) jResult = NULL;
 		if (jResult != NULL)
+		{
 			buffer = ndkFromJavaString(javaEnv, jResult);
+			(*javaEnv)->DeleteLocalRef(javaEnv, jResult);
+		}
 		else
 			buffer = qspGetNewText(QSP_FMT(""), 0);
 		(*javaEnv)->DeleteLocalRef(javaEnv, qspText);
