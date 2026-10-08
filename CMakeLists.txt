@@ -10,6 +10,7 @@ include(FetchContent)
 
 option(BUILD_JVM "Build with JVM bindings" OFF)
 option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
+option(QSP_LEGACY_BUILD_TESTS "Build the test runner and register the tests with CTest" OFF)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
@@ -191,3 +192,11 @@ install(FILES
 		DESTINATION
 		"${CMAKE_INSTALL_INCLUDEDIR}/qsp-legacy/default"
 )
+
+if (QSP_LEGACY_BUILD_TESTS)
+	if (BUILD_JVM)
+		message(FATAL_ERROR "The tests use the default binding, turn BUILD_JVM off to build them")
+	endif()
+	enable_testing()
+	add_subdirectory(tests)
+endif()
