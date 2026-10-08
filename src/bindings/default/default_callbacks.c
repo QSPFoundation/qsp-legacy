@@ -105,7 +105,7 @@ void qspCallOpenQuest(QSP_CHAR* fileName, QSP_BOOL isAddLocs)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_OPENGAME])
 	{
-		qspSaveCallState(&state, QSP_FALSE, QSP_FALSE);
+		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
 		qspCallBacks[QSP_CALL_OPENGAME](fileName, isAddLocs);
 		qspRestoreCallState(&state);
 	}
