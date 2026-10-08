@@ -319,7 +319,12 @@ JNIEXPORT jobject JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_getVarValues(JN
 	//Call QSP function
 	int numVal = 0;
 	QSP_CHAR *strVal;
-	QSP_BOOL result = QSPGetVarValues(strConverted, ind, &numVal, &strVal);
+	QSP_BOOL result = QSP_FALSE;
+	if (strConverted)
+	{
+		result = QSPGetVarValues(strConverted, ind, &numVal, &strVal);
+		free(strConverted);
+	}
 
 	// If this class does not exist then return null.
 	if (ndkVarValResp == 0)
