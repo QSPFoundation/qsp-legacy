@@ -30,8 +30,19 @@ int qspCurLoc = -1;
 int qspRefreshCount = 0;
 int qspFullRefreshCount = 0;
 
+typedef struct
+{
+	QSP_CHAR *Text;
+	QSP_BOOL IsReleased;
+} QSPLocTextRef;
+
+static QSPLocTextRef *qspLocTextRefs = 0;
+static int qspLocTextRefsCount = 0;
+static int qspLocTextRefsBufSize = 0;
+
 INLINE int qspLocsCompare(const void *, const void *);
 INLINE int qspLocStringCompare(const void *, const void *);
+INLINE void qspReleaseLocText(QSP_CHAR *);
 
 INLINE int qspLocsCompare(const void *locName1, const void *locName2)
 {
@@ -43,6 +54,52 @@ INLINE int qspLocStringCompare(const void *name, const void *compareTo)
 	return qspStrsComp((QSP_CHAR *)name, ((QSPLocName *)compareTo)->Name);
 }
 
+INLINE void qspReleaseLocText(QSP_CHAR *text)
+{
+	int i;
+	QSP_BOOL isInUse = QSP_FALSE;
+	for (i = 0; i < qspLocTextRefsCount; ++i)
+	{
+		if (qspLocTextRefs[i].Text == text)
+		{
+			qspLocTextRefs[i].IsReleased = QSP_TRUE;
+			isInUse = QSP_TRUE;
+		}
+	}
+	if (!isInUse) free(text);
+}
+
+QSP_CHAR *qspFormatLocText(QSP_CHAR *text)
+{
+	int i;
+	QSP_CHAR *res;
+	QSPLocTextRef *refs;
+	if (qspLocTextRefsCount == qspLocTextRefsBufSize)
+	{
+		if (!(refs = (QSPLocTextRef *)realloc(qspLocTextRefs, (qspLocTextRefsBufSize + 8) * sizeof(QSPLocTextRef))))
+			return qspFormatText(text, QSP_FALSE);
+		qspLocTextRefs = refs;
+		qspLocTextRefsBufSize += 8;
+	}
+	qspLocTextRefs[qspLocTextRefsCount].Text = text;
+	qspLocTextRefs[qspLocTextRefsCount].IsReleased = QSP_FALSE;
+	++qspLocTextRefsCount;
+	res = qspFormatText(text, QSP_FALSE);
+	if (qspLocTextRefs[--qspLocTextRefsCount].IsReleased)
+	{
+		for (i = 0; i < qspLocTextRefsCount; ++i)
+			if (qspLocTextRefs[i].Text == text) break;
+		if (i == qspLocTextRefsCount) free(text);
+	}
+	if (!qspLocTextRefsCount)
+	{
+		free(qspLocTextRefs);
+		qspLocTextRefs = 0;
+		qspLocTextRefsBufSize = 0;
+	}
+	return res;
+}
+
 void qspCreateWorld(int start, int locsCount)
 {
 	int i, j;
@@ -50,14 +107,14 @@ void qspCreateWorld(int start, int locsCount)
 	{
 		free(qspLocsNames[i].Name);
 		free(qspLocs[i].Name);
-		free(qspLocs[i].Desc);
+		qspReleaseLocText(qspLocs[i].Desc);
 		qspFreePrepLines(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount);
 		for (j = 0; j < QSP_MAXACTIONS; ++j)
         {
 			if (qspLocs[i].Actions[j].Desc)
 			{
 				if (qspLocs[i].Actions[j].Image) free(qspLocs[i].Actions[j].Image);
-				free(qspLocs[i].Actions[j].Desc);
+				qspReleaseLocText(qspLocs[i].Actions[j].Desc);
 				qspFreePrepLines(qspLocs[i].Actions[j].OnPressLines, qspLocs[i].Actions[j].OnPressLinesCount);
 			}
         }
@@ -111,14 +168,14 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 	QSP_CHAR *str;
 	QSPLineOfCode *code;
 	int i, count, oldLoc, oldActIndex, oldLine;
-	QSPLocation *loc = qspLocs + locInd;
+	QSPLocation *loc;
 	oldLoc = qspRealCurLoc;
 	oldActIndex = qspRealActIndex;
 	oldLine = qspRealLine;
 	qspRealCurLoc = locInd;
 	qspRealActIndex = -1;
 	qspRealLine = 0;
-	if (!(str = qspFormatText(loc->Desc, QSP_FALSE)))
+	if (!(str = qspFormatLocText(qspLocs[locInd].Desc)))
 	{
 		qspRealLine = oldLine;
 		qspRealActIndex = oldActIndex;
@@ -142,15 +199,22 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 	}
 	for (i = 0; i < QSP_MAXACTIONS; ++i)
 	{
-		str = loc->Actions[i].Desc;
+		if (locInd >= qspLocsCount) break;
+		str = qspLocs[locInd].Actions[i].Desc;
 		if (!(str && *str)) break;
-		if (!(str = qspFormatText(str, QSP_FALSE)))
+		if (!(str = qspFormatLocText(str)))
 		{
 			qspRealLine = oldLine;
 			qspRealActIndex = oldActIndex;
 			qspRealCurLoc = oldLoc;
 			return;
 		}
+		if (locInd >= qspLocsCount)
+		{
+			free(str);
+			break;
+		}
+		loc = qspLocs + locInd;
 		qspRealActIndex = i;
 		args[0].IsStr = QSP_TRUE;
 		QSP_STR(args[0]) = str;
@@ -174,14 +238,18 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 		}
 	}
 	qspRealActIndex = -1;
-	if (locInd < qspLocsCount - qspCurIncLocsCount)
-		qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
-	else
+	if (locInd < qspLocsCount)
 	{
-		count = loc->OnVisitLinesCount;
-		qspCopyPrepLines(&code, loc->OnVisitLines, 0, count);
-		qspExecCode(code, 0, count, 1, 0);
-		qspFreePrepLines(code, count);
+		loc = qspLocs + locInd;
+		if (locInd < qspLocsCount - qspCurIncLocsCount)
+			qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
+		else
+		{
+			count = loc->OnVisitLinesCount;
+			qspCopyPrepLines(&code, loc->OnVisitLines, 0, count);
+			qspExecCode(code, 0, count, 1, 0);
+			qspFreePrepLines(code, count);
+		}
 	}
 	qspRealLine = oldLine;
 	qspRealActIndex = oldActIndex;
