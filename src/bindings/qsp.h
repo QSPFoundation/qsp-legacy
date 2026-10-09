@@ -104,4 +104,15 @@
 		QSP_CHAR *IntLine; /* line of the actual code */
 	} QSPErrorInfo;
 
+	typedef void (*QSP_STR_CALLBACK)(const QSP_CHAR *);
+	typedef void (*QSP_INT_CALLBACK)(int);
+	typedef void (*QSP_BOOL_CALLBACK)(QSP_BOOL);
+	typedef void (*QSP_STR_INT_CALLBACK)(const QSP_CHAR *, int);
+	typedef void (*QSP_STR_BOOL_CALLBACK)(const QSP_CHAR *, QSP_BOOL);
+	typedef void (*QSP_INT_BOOL_CALLBACK)(int, QSP_BOOL);
+	typedef QSP_BOOL (*QSP_ISPLAYINGFILE_CALLBACK)(const QSP_CHAR *);
+	typedef int (*QSP_SHOWMENU_CALLBACK)(QSPListItem *, int);
+	typedef int (*QSP_GETMSCOUNT_CALLBACK)(void);
+	typedef void (*QSP_INPUTBOX_CALLBACK)(const QSP_CHAR *, QSP_CHAR *, int);
+
 #endif
