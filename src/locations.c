@@ -40,9 +40,21 @@ static QSPLocTextRef *qspLocTextRefs = 0;
 static int qspLocTextRefsCount = 0;
 static int qspLocTextRefsBufSize = 0;
 
+typedef struct
+{
+	QSPLineOfCode *Lines;
+	QSP_BOOL IsReleased;
+} QSPLocCodeRef;
+
+static QSPLocCodeRef *qspLocCodeRefs = 0;
+static int qspLocCodeRefsCount = 0;
+static int qspLocCodeRefsBufSize = 0;
+
 INLINE int qspLocsCompare(const void *, const void *);
 INLINE int qspLocStringCompare(const void *, const void *);
 INLINE void qspReleaseLocText(QSP_CHAR *);
+INLINE void qspReleaseLocCode(QSPLineOfCode *, int);
+INLINE void qspExecLocCode(QSPLineOfCode *, int);
 
 INLINE int qspLocsCompare(const void *locName1, const void *locName2)
 {
@@ -67,6 +79,57 @@ INLINE void qspReleaseLocText(QSP_CHAR *text)
 		}
 	}
 	if (!isInUse) free(text);
+}
+
+INLINE void qspReleaseLocCode(QSPLineOfCode *lines, int count)
+{
+	int i;
+	QSP_BOOL isInUse = QSP_FALSE;
+	for (i = 0; i < qspLocCodeRefsCount; ++i)
+	{
+		if (qspLocCodeRefs[i].Lines == lines)
+		{
+			qspLocCodeRefs[i].IsReleased = QSP_TRUE;
+			isInUse = QSP_TRUE;
+		}
+	}
+	if (!isInUse) qspFreePrepLines(lines, count);
+}
+
+INLINE void qspExecLocCode(QSPLineOfCode *lines, int count)
+{
+	int i;
+	QSPLineOfCode *code;
+	QSPLocCodeRef *refs;
+	if (qspLocCodeRefsCount == qspLocCodeRefsBufSize)
+	{
+		if (!(refs = (QSPLocCodeRef *)realloc(qspLocCodeRefs, (qspLocCodeRefsBufSize + 8) * sizeof(QSPLocCodeRef))))
+		{
+			/* The code can't be tracked, a copy is executed */
+			qspCopyPrepLines(&code, lines, 0, count);
+			qspExecCode(code, 0, count, 1, 0);
+			qspFreePrepLines(code, count);
+			return;
+		}
+		qspLocCodeRefs = refs;
+		qspLocCodeRefsBufSize += 8;
+	}
+	qspLocCodeRefs[qspLocCodeRefsCount].Lines = lines;
+	qspLocCodeRefs[qspLocCodeRefsCount].IsReleased = QSP_FALSE;
+	++qspLocCodeRefsCount;
+	qspExecCode(lines, 0, count, 1, 0);
+	if (qspLocCodeRefs[--qspLocCodeRefsCount].IsReleased)
+	{
+		for (i = 0; i < qspLocCodeRefsCount; ++i)
+			if (qspLocCodeRefs[i].Lines == lines) break;
+		if (i == qspLocCodeRefsCount) qspFreePrepLines(lines, count);
+	}
+	if (!qspLocCodeRefsCount)
+	{
+		free(qspLocCodeRefs);
+		qspLocCodeRefs = 0;
+		qspLocCodeRefsBufSize = 0;
+	}
 }
 
 QSP_CHAR *qspFormatLocText(QSP_CHAR *text)
@@ -108,7 +171,7 @@ void qspCreateWorld(int start, int locsCount)
 		free(qspLocsNames[i].Name);
 		free(qspLocs[i].Name);
 		qspReleaseLocText(qspLocs[i].Desc);
-		qspFreePrepLines(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount);
+		qspReleaseLocCode(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount);
 		for (j = 0; j < QSP_MAXACTIONS; ++j)
         {
 			if (qspLocs[i].Actions[j].Desc)
@@ -242,7 +305,7 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 	{
 		loc = qspLocs + locInd;
 		if (locInd < qspLocsCount - qspCurIncLocsCount)
-			qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
+			qspExecLocCode(loc->OnVisitLines, loc->OnVisitLinesCount);
 		else
 		{
 			count = loc->OnVisitLinesCount;

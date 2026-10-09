@@ -66,3 +66,37 @@ x = 1 & OPENGAME & x = 2
 @run
 @expect event load_save
 @expect x => 2
+
+@test OPENQST from dynamic code switches the game
+@module 2.qsp
+# first
+y = 5
+---
+@src
+x = 1 & dynamic 'OPENQST ''2.qsp''' & x = 2
+@run
+@expect event open_game 2.qsp 0
+@expect curloc first
+@expect y => 5
+@expect loc('test') => 0
+
+@test OPENQST from a function switches the game
+@module 2.qsp
+# first
+y = 5
+---
+@game
+# start
+---
+# test
+x = 1 & z = func('opener') + 1 & x = 2
+---
+# opener
+OPENQST '2.qsp'
+result = 1
+---
+@run
+@expect event open_game 2.qsp 0
+@expect curloc first
+@expect y => 5
+@expect loc('opener') => 0
