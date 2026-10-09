@@ -19,7 +19,7 @@
 	#define QSP_JVMDEFINES
 
 	#include <jni.h>
-	static int qspEndiannessTestValue = 1;
+	#define QSP_IS_LITTLE_ENDIAN (*(const unsigned char *)&(const unsigned int){ 1 } == 1)
 
 	#ifdef _UNICODE
 		typedef unsigned short QSP_CHAR;
@@ -45,7 +45,7 @@
 		#error "Non-Unicode build using JVM binding is not supported"
 	#endif
 
-	#define QSP_FIXBYTESORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
+	#define QSP_FIXBYTESORDER(a) (QSP_IS_LITTLE_ENDIAN ? \
 			(a) : \
 			((unsigned short)(((a) << 8) | ((a) >> 8))))
 

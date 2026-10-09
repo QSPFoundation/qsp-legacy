@@ -20,14 +20,14 @@
 #ifndef QSP_DEFAULTDEFINES
 	#define QSP_DEFAULTDEFINES
 
-	static int qspEndiannessTestValue = 1;
+	#define QSP_IS_LITTLE_ENDIAN (*(const unsigned char *)&(const unsigned int){ 1 } == 1)
 
 	#ifdef _UNICODE
 		typedef uint16_t QSP_CHAR;
 		#define QSP_FMT2(x) u##x
 		#define QSP_FMT(x) QSP_FMT2(x)
 
-		#define QSP_ONIG_ENC ((*(unsigned char *)&(qspEndiannessTestValue) == 1) ? \
+		#define QSP_ONIG_ENC (QSP_IS_LITTLE_ENDIAN ? \
                              (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
                              (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_BE : ONIG_ENCODING_UTF32_BE))
 
@@ -70,7 +70,7 @@
 		#endif
 	#endif
 
-	#define QSP_FIXBYTESORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
+	#define QSP_FIXBYTESORDER(a) (QSP_IS_LITTLE_ENDIAN ? \
 			(a) : \
 			((unsigned short)(((a) << 8) | ((a) >> 8))))
 
