@@ -397,3 +397,38 @@ arr[0] = 123 & x = arr[-1] & arr[-1] = 234 & y = arr[0]
 
 @test SORTARR: sorting mized values should error
 @skip SORTARR is not supported by qsp-legacy (QSP 5.7)
+
+@test failed assignment to a new text index leaves no key
+@src
+a['x'] = 'text'
+@run
+@expect error TYPEMISMATCH
+@exec a['y'] = 2
+@expect a['y'] => 2
+@expect a['x'] => 0
+@expect arrsize('a') => 1
+
+@test failed assignment to a new text index and numeric growth
+@src
+a['x'] = 'text'
+@run
+@expect error TYPEMISMATCH
+@exec a[0] = 5
+@expect a['x'] => 0
+@exec a['x'] = 7
+@expect a[0] => 5
+@expect a[1] => 7
+
+@test killvar after a failed assignment to a new text index
+@src
+a['x'] = 'text'
+@run
+@expect error TYPEMISMATCH
+@exec a['y'] = 2 & a['z'] = 3
+@exec killvar 'a', 0
+@expect arrsize('a') => 1
+@expect a['z'] => 3
+@expect a['y'] => 0
+@exec a['y'] = 5
+@expect a['y'] => 5
+@expect arrsize('a') => 2

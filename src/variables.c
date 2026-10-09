@@ -48,10 +48,12 @@ INLINE int qspIndStringCompare(const void *, const void *);
 INLINE void qspRemoveArray(QSP_CHAR *);
 INLINE void qspRemoveArrayItem(QSP_CHAR *, int);
 INLINE void qspInitVarData(QSPVar *);
+INLINE void qspRemoveUnusedIndices(QSPVar *);
 INLINE int qspGetVarTextIndex(QSPVar *, QSP_CHAR *, QSP_BOOL);
 INLINE QSPVar *qspGetVarData(QSP_CHAR *, QSP_BOOL, int *);
 INLINE void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
 INLINE void qspSetVar(QSP_CHAR *, QSPVariant *, QSP_CHAR);
+INLINE void qspSetVarByOperation(QSPVar *, int, QSP_CHAR *, QSPVariant *, QSP_CHAR);
 INLINE QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
 INLINE void qspCopyVar(QSPVar *, QSPVar *, int, int);
 
@@ -108,9 +110,8 @@ INLINE void qspRemoveArray(QSP_CHAR *name)
 INLINE void qspRemoveArrayItem(QSP_CHAR *name, int index)
 {
 	QSPVar *var;
-	QSP_BOOL isRemoving;
 	QSPVarIndex *ind;
-	int origIndex;
+	int origIndex, count;
 	if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return;
 	if (index < 0 || index >= var->ValsCount) return;
 	origIndex = index;
@@ -121,20 +122,19 @@ INLINE void qspRemoveArrayItem(QSP_CHAR *name, int index)
 		var->Values[index] = var->Values[index + 1];
 		++index;
 	}
-	isRemoving = QSP_FALSE;
+	count = 0;
 	for (index = 0; index < var->IndsCount; ++index)
 	{
 		ind = var->Indices + index;
 		if (ind->Index == origIndex)
 		{
 			free(ind->Str);
-			var->IndsCount--;
-			if (index == var->IndsCount) break;
-			isRemoving = QSP_TRUE;
+			continue;
 		}
-		if (isRemoving) *ind = var->Indices[index + 1];
 		if (ind->Index > origIndex) ind->Index--;
+		var->Indices[count++] = *ind;
 	}
+	var->IndsCount = count;
 }
 
 INLINE void qspInitVarData(QSPVar *var)
@@ -195,6 +195,19 @@ QSPVar *qspVarReferenceWithType(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isS
 	return var;
 }
 
+INLINE void qspRemoveUnusedIndices(QSPVar *var)
+{
+	int i, count = 0;
+	for (i = 0; i < var->IndsCount; ++i)
+	{
+		if (var->Indices[i].Index >= var->ValsCount)
+			free(var->Indices[i].Str);
+		else
+			var->Indices[count++] = var->Indices[i];
+	}
+	var->IndsCount = count;
+}
+
 INLINE int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 {
 	QSP_CHAR *uStr;
@@ -212,6 +225,8 @@ INLINE int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 	}
 	if (isCreate)
 	{
+		qspRemoveUnusedIndices(var);
+		n = var->IndsCount;
 		var->IndsCount++;
 		if (var->IndsBufSize == n)
 		{
@@ -325,10 +340,16 @@ void qspSetVarValueByName(QSP_CHAR *name, QSPVariant *val)
 
 INLINE void qspSetVar(QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
 {
-	QSPVariant oldVal;
 	QSPVar *var;
 	int index;
 	if (!(var = qspGetVarData(name, QSP_TRUE, &index))) return;
+	qspSetVarByOperation(var, index, name, val, op);
+	if (qspErrorNum) qspRemoveUnusedIndices(var);
+}
+
+INLINE void qspSetVarByOperation(QSPVar *var, int index, QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
+{
+	QSPVariant oldVal;
 	if (op == QSP_EQUAL[0])
 	{
 		if (qspConvertVariantTo(val, *name == QSP_STRCHAR[0]))
