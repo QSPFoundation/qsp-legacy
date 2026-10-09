@@ -242,7 +242,7 @@ INLINE QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
 void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isAddLocs)
 {
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
-	int i, j, ind, crc, count, locsCount, actsCount, start, end;
+	int i, j, ind, crc = 0, count, locsCount, actsCount, start, end;
 	QSP_CHAR *buf;
 	char **strs;
 	if (dataSize < 2)
@@ -267,6 +267,12 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isAddLocs)
 	free(buf);
 	if (isAddLocs)
 	{
+		if (locsCount > INT_MAX - qspLocsCount)
+		{
+			qspSetError(QSP_ERR_CANTLOADFILE);
+			qspFreeGameStrs(strs, count);
+			return;
+		}
 		start = qspLocsCount;
 		end = start + locsCount;
 	}
@@ -277,7 +283,12 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isAddLocs)
 		end = locsCount;
 	}
 	locsCount = qspLocsCount;
-	qspCreateWorld(start, end);
+	if (!qspCreateWorld(start, end))
+	{
+		qspSetError(QSP_ERR_CANTLOADFILE);
+		qspFreeGameStrs(strs, count);
+		return;
+	}
 	qspLocsCount = locsCount;
 	locsCount = start;
 	ind = (isOldFormat ? 30 : 4);

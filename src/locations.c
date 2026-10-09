@@ -163,9 +163,19 @@ QSP_CHAR *qspFormatLocText(QSP_CHAR *text)
 	return res;
 }
 
-void qspCreateWorld(int start, int locsCount)
+QSP_BOOL qspCreateWorld(int start, int locsCount)
 {
 	int i, j;
+	QSPLocation *locs;
+	QSPLocName *names;
+	if (locsCount > qspLocsCount)
+	{
+		if ((size_t)locsCount > (size_t)-1 / sizeof(QSPLocation)) return QSP_FALSE;
+		if (!(locs = (QSPLocation *)realloc(qspLocs, locsCount * sizeof(QSPLocation)))) return QSP_FALSE;
+		qspLocs = locs;
+		if (!(names = (QSPLocName *)realloc(qspLocsNames, locsCount * sizeof(QSPLocName)))) return QSP_FALSE;
+		qspLocsNames = names;
+	}
 	for (i = start; i < qspLocsCount; ++i)
 	{
 		free(qspLocsNames[i].Name);
@@ -182,18 +192,30 @@ void qspCreateWorld(int start, int locsCount)
 			}
         }
 	}
-	if (qspLocsCount != locsCount)
+	if (locsCount < qspLocsCount)
 	{
-		qspLocsCount = locsCount;
-		qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
-		qspLocsNames = (QSPLocName *)realloc(qspLocsNames, qspLocsCount * sizeof(QSPLocName));
+		if (!locsCount)
+		{
+			free(qspLocs);
+			free(qspLocsNames);
+			qspLocs = 0;
+			qspLocsNames = 0;
+		}
+		else
+		{
+			/* Shrinking that fails keeps the larger arrays */
+			if ((locs = (QSPLocation *)realloc(qspLocs, locsCount * sizeof(QSPLocation)))) qspLocs = locs;
+			if ((names = (QSPLocName *)realloc(qspLocsNames, locsCount * sizeof(QSPLocName)))) qspLocsNames = names;
+		}
 	}
+	qspLocsCount = locsCount;
 	for (i = start; i < qspLocsCount; ++i)
 	{
 		qspLocsNames[i].Name = 0;
 		for (j = 0; j < QSP_MAXACTIONS; ++j)
 			qspLocs[i].Actions[j].Desc = 0;
 	}
+	return QSP_TRUE;
 }
 
 void qspPrepareLocs()
