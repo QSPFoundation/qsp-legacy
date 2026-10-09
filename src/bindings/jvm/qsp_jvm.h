@@ -29,8 +29,6 @@
 		#define QSP_STRCOLL qspStrsComp
 		#define QSP_CHRLWR qspToWLower
 		#define QSP_CHRUPR qspToWUpper
-		#define QSP_WCSTOMBSLEN(a) (int)wcstombs(0, a, 0)
-		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
 		#define QSP_ONIG_ENC (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE)
 		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
