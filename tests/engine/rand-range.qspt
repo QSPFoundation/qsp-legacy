@@ -1,0 +1,44 @@
+// Regression tests: RAND with a range wider than INT_MAX,
+// the size of the full range of int was computed as 0 and used as a divisor
+
+@test rand: the full range of int
+@src
+res = rand(-2147483647 - 1, 2147483647)
+done = 1
+@run
+@expect done => 1
+
+@test rand: the full range of int, reversed arguments
+@src
+res = rand(2147483647, -2147483647 - 1)
+done = 1
+@run
+@expect done => 1
+
+@test rand: a range wider than INT_MAX stays within the bounds
+@src
+i = 0
+:loop
+res = rand(-2, 2147483647)
+if res < -2: bad = 1
+i += 1
+if i < 100: jump 'loop'
+@run
+@expect bad => 0
+
+@test rand: the negative half of int stays within the bounds
+@src
+i = 0
+:loop
+res = rand(-2147483647 - 1, -1)
+if res >= 0: bad = 1
+i += 1
+if i < 100: jump 'loop'
+@run
+@expect bad => 0
+
+@test rand: a single value
+@src
+res = rand(5, 5)
+@run
+@expect res => 5

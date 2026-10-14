@@ -1047,6 +1047,7 @@ INLINE void qspFunctionMid(QSPVariant *args, int count, QSPVariant *tos)
 INLINE void qspFunctionRand(QSPVariant *args, int count, QSPVariant *tos)
 {
 	int min, max;
+	unsigned int range;
 	min = QSP_NUM(args[0]);
 	max = (count == 2 ? QSP_NUM(args[1]) : 0);
 	if (min > max)
@@ -1054,7 +1055,9 @@ INLINE void qspFunctionRand(QSPVariant *args, int count, QSPVariant *tos)
 		min = max;
 		max = QSP_NUM(args[0]);
 	}
-	QSP_PNUM(tos) = qspRand() % (max - min + 1) + min;
+	/* The range can exceed INT_MAX, it's 0 for the full range of int */
+	range = (unsigned int)max - (unsigned int)min + 1U;
+	QSP_PNUM(tos) = (int)((unsigned int)min + (range ? (unsigned int)qspRand() % range : (unsigned int)qspRand()));
 }
 
 INLINE void qspFunctionDesc(QSPVariant *args, int count, QSPVariant *tos)
