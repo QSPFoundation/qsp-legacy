@@ -68,6 +68,7 @@ action of the test.
 | `@select-obj N` | `QSPSetSelObjectIndex` |
 | `@restart` | `QSPRestartGame` |
 | `@save NAME` / `@load-save NAME` | `QSPSaveGameAsData` / `QSPOpenSavedGameFromData` into/from an in-memory slot |
+| `@save-file FILE` / `@load-file FILE` | `QSPSaveGameAsFile` / `QSPOpenSavedGameFromFile` with a file in the current directory |
 | `@debug 0/1` | `QSPEnableDebugMode` |
 | `@clear-events` | forgets the recorded events |
 

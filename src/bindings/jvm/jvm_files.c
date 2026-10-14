@@ -32,15 +32,4 @@ void qspOpenGameStatusFromFILE(FILE *f)
     free(buf);
 }
 
-void qspSaveGameStatusToFILE(FILE *f)
-{
-    int len;
-    QSP_CHAR *buf;
-    if ((len = qspSaveGameStatusToString(&buf)))
-    {
-        fwrite(buf, sizeof(QSP_CHAR), len, f);
-        free(buf);
-    }
-}
-
 #endif

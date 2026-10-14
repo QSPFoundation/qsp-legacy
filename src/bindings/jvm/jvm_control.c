@@ -510,19 +510,28 @@ JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_saveGameByFD(J
 
 	if (qspIsDisableCodeExec) return QSP_FALSE;
 
-	const int native_fd = dup(fileDescriptor);
-	if (native_fd < 0) return QSP_FALSE;
-
-	FILE *f = fdopen(native_fd, "wb");
-	if (!f) {
-		close(native_fd);
-		qspSetError(QSP_ERR_FILENOTFOUND);
-		return QSP_FALSE;
-	}
-	qspSaveGameStatusToFILE(f);
-	fclose(f);
-
+	QSP_CHAR *data;
+	int len = qspSaveGameStatusToString(&data);
 	if (qspErrorNum) return QSP_FALSE;
+
+	if (len) {
+		const int native_fd = dup(fileDescriptor);
+		if (native_fd < 0) {
+			free(data);
+			return QSP_FALSE;
+		}
+		FILE *f = fdopen(native_fd, "wb");
+		if (!f) {
+			close(native_fd);
+			free(data);
+			qspSetError(QSP_ERR_FILENOTFOUND);
+			return QSP_FALSE;
+		}
+		fwrite(data, sizeof(QSP_CHAR), len, f);
+		fclose(f);
+		free(data);
+	}
+
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 
 	return QSP_TRUE;
@@ -598,22 +607,27 @@ JNIEXPORT jboolean JNICALL Java_com_libqsplegacy_jni_QSPLegacyLib_saveGameByPath
 
 	if (qspIsDisableCodeExec) return QSP_FALSE;
 
-	QSP_CHAR* path = ndkFromJavaString(env, filePath);
-
-	FILE *f = qspFileOpen(path, QSP_FMT("wb"));
-	if (f == NULL)
+	/* The state is formed before the file is opened: if $ONGSAVE fails */
+	/* or moves to another location, the existing file stays intact */
+	QSP_CHAR *data;
+	int len = qspSaveGameStatusToString(&data);
+	if (qspErrorNum) return QSP_FALSE;
+	if (len)
 	{
+		QSP_CHAR* path = ndkFromJavaString(env, filePath);
+		FILE *f = qspFileOpen(path, QSP_FMT("wb"));
 		free(path);
-		qspSetError(QSP_ERR_FILENOTFOUND);
-		return QSP_FALSE;
+		if (f == NULL)
+		{
+			free(data);
+			qspSetError(QSP_ERR_FILENOTFOUND);
+			return QSP_FALSE;
+		}
+		fwrite(data, sizeof(QSP_CHAR), len, f);
+		fclose(f);
+		free(data);
 	}
 
-	qspSaveGameStatusToFILE(f);
-
-	fclose(f);
-	free(path);
-
-	if (qspErrorNum) return QSP_FALSE;
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 
 	return QSP_TRUE;

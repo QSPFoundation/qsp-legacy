@@ -1,0 +1,55 @@
+// Saving to a file: the state is formed before the file is opened,
+// so a $ONGSAVE that fails or moves to another location keeps the existing file
+
+@test a failed $ONGSAVE keeps the existing save file
+@game
+# start
+---
+# test
+$ongsave = 'onsave'
+x = 1
+---
+# onsave
+if fail: n = 1 / 0
+---
+// A save made outside of a location can't be loaded, RESTART enters "start"
+@restart
+@run
+@save-file save-file-error.sav
+@exec x = 2 & fail = 1
+@save-file save-file-error.sav
+@expect error DIVBYZERO
+@load-file save-file-error.sav
+@expect x => 1
+@expect fail => 0
+
+@test $ONGSAVE moving to another location keeps the existing save file
+@game
+# start
+---
+# test
+$ongsave = 'onsave'
+x = 1
+---
+# onsave
+if move: gt 'start'
+---
+@restart
+@run
+@save-file save-file-move.sav
+@exec x = 2 & move = 1
+@save-file save-file-move.sav
+@load-file save-file-move.sav
+@expect x => 1
+@expect move => 0
+
+@test the state is saved to a file and loaded back
+@src
+x = 3 & $s = 'text'
+@restart
+@run
+@save-file save-file-plain.sav
+@exec x = 4 & $s = ''
+@load-file save-file-plain.sav
+@expect x => 3
+@expect $s => 'text'

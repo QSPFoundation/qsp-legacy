@@ -32,7 +32,6 @@
 #include "../../variables.h"
 
 INLINE void qspOpenQuestFromFILE(FILE *, QSP_BOOL);
-INLINE void qspSaveGameStatusToFILE(FILE *);
 INLINE void qspOpenGameStatusFromFILE(FILE *);
 
 INLINE void qspOpenQuestFromFILE(FILE *f, const QSP_BOOL isAddLocs)
@@ -60,17 +59,6 @@ INLINE void qspOpenGameStatusFromFILE(FILE *f)
 	((QSP_CHAR *)buf)[dataSize / sizeof(QSP_CHAR)] = 0;
 	qspOpenGameStatusFromString((QSP_CHAR *)buf);
 	free(buf);
-}
-
-INLINE void qspSaveGameStatusToFILE(FILE *f)
-{
-	int len;
-	QSP_CHAR *buf;
-	if ((len = qspSaveGameStatusToString(&buf)))
-	{
-		fwrite(buf, sizeof(QSP_CHAR), len, f);
-		free(buf);
-	}
 }
 
 /* ------------------------------------------------------------ */
@@ -471,18 +459,22 @@ QSP_BOOL QSPSaveGameAsFile(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 
 	if (qspIsDisableCodeExec) return QSP_FALSE;
 
-	FILE *f = qspFileOpen((QSP_CHAR *)fileName, QSP_FMT("wb"));
-	if (f == NULL)
-	{
-		qspSetError(QSP_ERR_FILENOTFOUND);
-		return QSP_FALSE;
+	QSP_CHAR *data;
+	int len = qspSaveGameStatusToString(&data);
+	if (qspErrorNum) return QSP_FALSE;
+
+	if (len) {
+		FILE *f = qspFileOpen((QSP_CHAR *)fileName, QSP_FMT("wb"));
+		if (f == NULL) {
+			free(data);
+			qspSetError(QSP_ERR_FILENOTFOUND);
+			return QSP_FALSE;
+		}
+		fwrite(data, sizeof(QSP_CHAR), len, f);
+		fclose(f);
+		free(data);
 	}
 
-	qspSaveGameStatusToFILE(f);
-
-	fclose(f);
-
-	if (qspErrorNum) return QSP_FALSE;
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 
 	return QSP_TRUE;

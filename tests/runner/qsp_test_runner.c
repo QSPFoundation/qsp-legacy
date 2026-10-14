@@ -1222,6 +1222,20 @@ static void runCommand(const char *line, char **block, int blockCount)
 		checkNoPendingError();
 		loadFromSlot(arg);
 	}
+	else if ((arg = command(line, "@save-file")))
+	{
+		ensureGameLoaded();
+		qStr = toQsp(arg);
+		afterCall(QSPSaveGameAsFile(qStr, QSP_FALSE));
+		free(qStr);
+	}
+	else if ((arg = command(line, "@load-file")))
+	{
+		checkNoPendingError();
+		qStr = toQsp(arg);
+		afterCall(QSPOpenSavedGameFromFile(qStr, QSP_FALSE));
+		free(qStr);
+	}
 	else if ((arg = command(line, "@debug")))
 		QSPEnableDebugMode(atoi(arg) != 0);
 	else if ((arg = command(line, "@clear-events")))
