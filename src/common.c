@@ -138,7 +138,7 @@ INLINE unsigned int qspURand()
 
 int qspRand()
 {
-	int i = qspRandZ >> 24;
+	int i = (int)((qspRandZ >> 24) & 0xFF); /* qspRandY has 256 items, unsigned int can be wider than 32 bits */
 	qspRandZ = qspRandY[i];
 	if (--qspRandI < 0) qspRandI = 54;
 	if (--qspRandJ < 0) qspRandJ = 54;
