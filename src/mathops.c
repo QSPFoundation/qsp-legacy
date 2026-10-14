@@ -446,7 +446,10 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 					qspSetError(QSP_ERR_DIVBYZERO);
 					break;
 				}
-				QSP_NUM(tos) = QSP_NUM(args[0]) / QSP_NUM(args[1]);
+				if (QSP_NUM(args[1]) == -1) /* INT_MIN / -1 can't be represented */
+					QSP_NUM(tos) = (int)(0U - (unsigned int)QSP_NUM(args[0]));
+				else
+					QSP_NUM(tos) = QSP_NUM(args[0]) / QSP_NUM(args[1]);
 				break;
 			case qspOpAdd:
 				if (args[0].IsStr && args[1].IsStr)
@@ -480,7 +483,10 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 					qspSetError(QSP_ERR_DIVBYZERO);
 					break;
 				}
-				QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
+				if (QSP_NUM(args[1]) == -1) /* INT_MIN % -1 can't be computed */
+					QSP_NUM(tos) = 0;
+				else
+					QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
 				break;
 			case qspOpAppend:
 				len = qspAddText(&QSP_STR(tos), QSP_STR(args[0]), 0, -1, QSP_TRUE);

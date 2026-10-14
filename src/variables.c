@@ -407,7 +407,10 @@ INLINE void qspSetVarByOperation(QSPVar *var, int index, QSP_CHAR *name, QSPVari
 				qspSetError(QSP_ERR_DIVBYZERO);
 				return;
 			}
-			QSP_NUM(oldVal) /= QSP_PNUM(val);
+			if (QSP_PNUM(val) == -1) /* INT_MIN / -1 can't be represented */
+				QSP_NUM(oldVal) = (int)(0U - (unsigned int)QSP_NUM(oldVal));
+			else
+				QSP_NUM(oldVal) /= QSP_PNUM(val);
 		}
 		else
 			QSP_NUM(oldVal) *= QSP_PNUM(val);

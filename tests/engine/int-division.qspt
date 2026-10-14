@@ -1,0 +1,42 @@
+// Regression tests: the minimal integer divided by -1 can't be represented,
+// the hardware division traps (SIGFPE on x86) instead of returning a value
+
+@test /: -2147483648 / -1 wraps around to -2147483648
+@src
+x = -2147483647 - 1
+res = x / -1
+@run
+@expect res => -2147483648
+
+@test /: 7 / -1 = -7
+@src
+res = 7 / -1
+@run
+@expect res => -7
+
+@test /=: res /= -1 with -2147483648 wraps around to -2147483648
+@src
+res = -2147483647 - 1
+res /= -1
+@run
+@expect res => -2147483648
+
+@test /=: res /= -1 -> -7
+@src
+res = 7
+res /= -1
+@run
+@expect res => -7
+
+@test mod: -2147483648 mod -1 = 0
+@src
+x = -2147483647 - 1
+res = x mod -1
+@run
+@expect res => 0
+
+@test mod: 7 mod -1 = 0
+@src
+res = 7 mod -1
+@run
+@expect res => 0
